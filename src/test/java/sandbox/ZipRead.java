@@ -9,7 +9,7 @@ import java.util.zip.ZipFile;
 public class ZipRead {
 
   public static void main(String[] args) throws IOException {
-    ZipFile zipFile = new ZipFile("F:\\dev\\James Mailets\\FSecureMailet\\target\\tmp\\eicar_com.zip");
+    ZipFile zipFile = new ZipFile("F:\\dev\\James Mailets\\JamesKPNVeiligMaillet\\src\\test\\resources\\eicar_com.zip");
 
     Enumeration<? extends ZipEntry> entries = zipFile.entries();
 

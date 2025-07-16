@@ -10,6 +10,7 @@ import static org.testng.Assert.assertNull;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -41,16 +42,13 @@ public class KPNVeiligVirusScanTest {
   public void setUp() throws Exception {
     mailet = new KPNVeiligVirusScan();
     mailetContext = mock(MailetContext.class);
-    mailetConfig = FakeMailetConfig.builder().mailetName("FSecureVirusScan").mailetContext(mailetContext)
-        .setProperty("fsecurePath", "C:\\Program Files (x86)\\KPN Veilig\\fsscan.exe")
-        .setProperty("tmpDir", "F:\\dev\\James Mailets\\FSecureMailet\\target\\tmp")
-        .setProperty("quarantineDir", "target/quarantine").build();
-    System.setProperty("org.slf4j.Logger", "DEBUG");
+    mailetConfig = FakeMailetConfig.builder().mailetName("KPNVeiligScan").mailetContext(mailetContext)
+        .setProperty("kpnVeiligPath", "C:\\Program Files (x86)\\KPN Veilig\\fsscan.exe")
+        .setProperty("tmpDir", "target\\tmp").setProperty("quarantineDir", "target/quarantine").build();
   }
 
   @Test
   public void testInitShouldCreateDirectories() throws Exception {
-    LOGGER.error("testInitShouldCreateDirectories");
     LOGGER.info("testInitShouldCreateDirectories");
     mailet.init(mailetConfig);
     // Hier zou je kunnen verifiëren of directories zijn aangemaakt
@@ -59,7 +57,7 @@ public class KPNVeiligVirusScanTest {
 
   @Test
   public void testCleanMailShouldContinueProcessing() throws Exception {
-    LOGGER.error("testCleanMailShouldContinueProcessing");
+    LOGGER.info("testCleanMailShouldContinueProcessing");
     // Arrange
     mailet.init(mailetConfig);
     Mail mail = createTestMail();
@@ -74,7 +72,7 @@ public class KPNVeiligVirusScanTest {
 
   @Test
   public void testInfectedMailShouldBeQuarantined() throws Exception {
-    LOGGER.error("testInfectedMailShouldBeQuarantined");
+    LOGGER.info("testInfectedMailShouldBeQuarantined");
     // Arrange
     mailet.init(mailetConfig);
     Mail mail = createInfectedMail();
@@ -92,7 +90,7 @@ public class KPNVeiligVirusScanTest {
 
   @Test(expectedExceptions = MessagingException.class)
   public void testScanFailureShouldThrowException() throws Exception {
-    LOGGER.error("testScanFailureShouldThrowException");
+    LOGGER.info("testScanFailureShouldThrowException");
     // Arrange
     mailet.init(mailetConfig);
     Mail mail = createTestMail();
@@ -107,11 +105,10 @@ public class KPNVeiligVirusScanTest {
 
   @Test
   public void testQuarantineDisabled() throws Exception {
-    LOGGER.error("testQuarantineDisabled");
+    LOGGER.info("testQuarantineDisabled");
     // Arrange
-    mailetConfig = FakeMailetConfig.builder().mailetName("FSecureVirusScan").mailetContext(mailetContext)
-        .setProperty("quarantine", "false").setProperty("tmpDir", "F:\\dev\\James Mailets\\FSecureMailet\\target\\tmp")
-        .build();
+    mailetConfig = FakeMailetConfig.builder().mailetName("KPNVeiligVirusScan").mailetContext(mailetContext)
+        .setProperty("quarantine", "false").setProperty("tmpDir", "target\\tmp").build();
     mailet.init(mailetConfig);
 
     Mail mail = createInfectedMail();
@@ -136,7 +133,8 @@ public class KPNVeiligVirusScanTest {
           .recipient("recipient@domain.com").build();
     } catch (Exception e) {
       // TODO Auto-generated catch block
-      e.printStackTrace();
+      LOGGER.info(e.getMessage().toString());
+      // e.printStackTrace();
     }
     return null;
   }
@@ -187,7 +185,8 @@ public class KPNVeiligVirusScanTest {
       return mail;
     } catch (Exception e) {
       // TODO Auto-generated catch block
-      e.printStackTrace();
+      // e.printStackTrace();
+      LOGGER.info(e.getMessage().toString());
     }
     return null;
   }
@@ -195,24 +194,25 @@ public class KPNVeiligVirusScanTest {
   @Test
   public void testKPNcall() throws Exception {
     mailet.init(mailetConfig);
-    System.out.println("testKPNcall");
-    LOGGER.error("testKPNcall");
+    LOGGER.info("testKPNcall");
 
-    Path zipPath = Paths.get("F:\\dev\\James Mailets\\FSecureMailet\\target\\tmp\\eicar_com.zip");
+    Path zipPath = Paths.get("resources\\eicar_com.zip");
 
     // Create a filesystem for the ZIP file
     try (FileSystem zipFs = FileSystems.newFileSystem(zipPath, (ClassLoader) null)) {
       // Get path to entry inside the ZIP
       Path entryPath = zipFs.getPath("eicar.com");
       // Path entryPath = zipFs.getPath("F:\\dev\\James
-      // Mailets\\FSecureMailet\\target\\tmp\\eicar.com");
+      // Mailets\\KPNVeiligMailet\\target\\tmp\\eicar.com");
 
       // File testfile = new File("target/tmp/ecar.eml");
       // Path pad = testfile.toPath();
+      LOGGER.debug("File:  " + fileExists(entryPath));
+
       KPNVeiligVirusScan spyMailet = spy(mailet);
 
       boolean result = spyMailet.scanFileWithKPNVScan(entryPath);
-      System.out.println("Result: " + result);
+      LOGGER.info("Result: " + result);
     }
 
   }
@@ -224,4 +224,13 @@ public class KPNVeiligVirusScanTest {
     return reverse(str.substring(1)) + str.charAt(0);
   }
 
+  String fileExists(Path path) {
+    if (Files.exists(path) && Files.isRegularFile(path)) {
+      return "Het bestand bestaat en is een normaal bestand.";
+    } else if (Files.exists(path) && Files.isDirectory(path)) {
+      return "Het pad verwijst naar een directory, niet naar een bestand.";
+    } else {
+      return "Het bestand bestaat niet.";
+    }
+  }
 }

@@ -10,7 +10,7 @@ import java.util.List;
 
 public class ZipFileSystemExample {
   public static void main(String[] args) throws IOException {
-    Path zipPath = Paths.get("F:\\dev\\James Mailets\\FSecureMailet\\target\\tmp\\eicar_com.zip");
+    Path zipPath = Paths.get("F:\\dev\\James Mailets\\JamesKPNVeiligMaillet\\src\\test\\resources\\eicar_com.zip");
 
     // Create a filesystem for the ZIP file
     try (FileSystem zipFs = FileSystems.newFileSystem(zipPath, (ClassLoader) null)) {

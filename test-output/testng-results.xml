@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results ignored="0" total="6" passed="2" failed="4" skipped="0">
+  <reporter-output>
+  </reporter-output>
+  <suite started-at="2025-07-15T19:40:56 CEST" name="Default suite" finished-at="2025-07-15T19:41:00 CEST" duration-ms="4270">
+    <groups>
+    </groups>
+    <test started-at="2025-07-15T19:40:56 CEST" name="Default test" finished-at="2025-07-15T19:41:00 CEST" duration-ms="4270">
+      <class name="com.kwee.james.mailets.KPNVeiligVirusScanTest">
+        <test-method is-config="true" signature="setUp()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@5cdec700]" started-at="2025-07-15T19:40:56 CEST" name="setUp" finished-at="2025-07-15T19:40:57 CEST" duration-ms="939" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method signature="testCleanMailShouldContinueProcessing()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@5cdec700]" started-at="2025-07-15T19:40:57 CEST" name="testCleanMailShouldContinueProcessing" finished-at="2025-07-15T19:40:58 CEST" duration-ms="1420" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- testCleanMailShouldContinueProcessing -->
+        <test-method is-config="true" signature="setUp()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@5cdec700]" started-at="2025-07-15T19:40:58 CEST" name="setUp" finished-at="2025-07-15T19:40:58 CEST" duration-ms="1" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method signature="testInfectedMailShouldBeQuarantined()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@5cdec700]" started-at="2025-07-15T19:40:58 CEST" name="testInfectedMailShouldBeQuarantined" finished-at="2025-07-15T19:40:59 CEST" duration-ms="916" status="FAIL">
+          <exception class="java.lang.AssertionError">
+            <message>
+              <![CDATA[Mail should be ghosted expected [ghost] but found [null]]]>
+            </message>
+            <full-stacktrace>
+              <![CDATA[java.lang.AssertionError: Mail should be ghosted expected [ghost] but found [null]
+at org.testng.Assert.fail(Assert.java:111)
+at org.testng.Assert.failNotEquals(Assert.java:1590)
+at org.testng.Assert.assertEqualsImpl(Assert.java:150)
+at org.testng.Assert.assertEquals(Assert.java:132)
+at org.testng.Assert.assertEquals(Assert.java:656)
+at com.kwee.james.mailets.KPNVeiligVirusScanTest.testInfectedMailShouldBeQuarantined(KPNVeiligVirusScanTest.java:88)
+at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+at org.testng.internal.invokers.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:141)
+at org.testng.internal.invokers.TestInvoker.invokeMethod(TestInvoker.java:687)
+at org.testng.internal.invokers.TestInvoker.invokeTestMethod(TestInvoker.java:230)
+at org.testng.internal.invokers.MethodRunner.runInSequence(MethodRunner.java:63)
+at org.testng.internal.invokers.TestInvoker$MethodInvocationAgent.invoke(TestInvoker.java:995)
+at org.testng.internal.invokers.TestInvoker.invokeTestMethods(TestInvoker.java:203)
+at org.testng.internal.invokers.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:154)
+at org.testng.internal.invokers.TestMethodWorker.run(TestMethodWorker.java:134)
+at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+at org.testng.TestRunner.privateRun(TestRunner.java:741)
+at org.testng.TestRunner.run(TestRunner.java:616)
+at org.testng.SuiteRunner.runTest(SuiteRunner.java:421)
+at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:413)
+at org.testng.SuiteRunner.privateRun(SuiteRunner.java:373)
+at org.testng.SuiteRunner.run(SuiteRunner.java:312)
+at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:95)
+at org.testng.TestNG.runSuitesSequentially(TestNG.java:1274)
+at org.testng.TestNG.runSuitesLocally(TestNG.java:1208)
+at org.testng.TestNG.runSuites(TestNG.java:1112)
+at org.testng.TestNG.run(TestNG.java:1079)
+at org.testng.remote.AbstractRemoteTestNG.run(AbstractRemoteTestNG.java:115)
+at org.testng.remote.RemoteTestNG.initAndRun(RemoteTestNG.java:293)
+at org.testng.remote.RemoteTestNG.main(RemoteTestNG.java:91)
+]]>
+            </full-stacktrace>
+          </exception> <!-- java.lang.AssertionError -->
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- testInfectedMailShouldBeQuarantined -->
+        <test-method is-config="true" signature="setUp()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@5cdec700]" started-at="2025-07-15T19:40:59 CEST" name="setUp" finished-at="2025-07-15T19:40:59 CEST" duration-ms="1" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method signature="testInitShouldCreateDirectories()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@5cdec700]" started-at="2025-07-15T19:40:59 CEST" name="testInitShouldCreateDirectories" finished-at="2025-07-15T19:40:59 CEST" duration-ms="2" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- testInitShouldCreateDirectories -->
+        <test-method is-config="true" signature="setUp()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@5cdec700]" started-at="2025-07-15T19:40:59 CEST" name="setUp" finished-at="2025-07-15T19:40:59 CEST" duration-ms="1" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method signature="testKPNcall()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@5cdec700]" started-at="2025-07-15T19:40:59 CEST" name="testKPNcall" finished-at="2025-07-15T19:40:59 CEST" duration-ms="19" status="FAIL">
+          <exception class="java.nio.file.NoSuchFileException">
+            <message>
+              <![CDATA[resources\eicar_com.zip]]>
+            </message>
+            <full-stacktrace>
+              <![CDATA[java.nio.file.NoSuchFileException: resources\eicar_com.zip
+at jdk.zipfs/jdk.nio.zipfs.ZipFileSystem.<init>(ZipFileSystem.java:166)
+at jdk.zipfs/jdk.nio.zipfs.ZipFileSystemProvider.getZipFileSystem(ZipFileSystemProvider.java:125)
+at jdk.zipfs/jdk.nio.zipfs.ZipFileSystemProvider.newFileSystem(ZipFileSystemProvider.java:120)
+at java.base/java.nio.file.FileSystems.newFileSystem(FileSystems.java:528)
+at java.base/java.nio.file.FileSystems.newFileSystem(FileSystems.java:400)
+at com.kwee.james.mailets.KPNVeiligVirusScanTest.testKPNcall(KPNVeiligVirusScanTest.java:202)
+at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+at org.testng.internal.invokers.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:141)
+at org.testng.internal.invokers.TestInvoker.invokeMethod(TestInvoker.java:687)
+at org.testng.internal.invokers.TestInvoker.invokeTestMethod(TestInvoker.java:230)
+at org.testng.internal.invokers.MethodRunner.runInSequence(MethodRunner.java:63)
+at org.testng.internal.invokers.TestInvoker$MethodInvocationAgent.invoke(TestInvoker.java:995)
+at org.testng.internal.invokers.TestInvoker.invokeTestMethods(TestInvoker.java:203)
+at org.testng.internal.invokers.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:154)
+at org.testng.internal.invokers.TestMethodWorker.run(TestMethodWorker.java:134)
+at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+at org.testng.TestRunner.privateRun(TestRunner.java:741)
+at org.testng.TestRunner.run(TestRunner.java:616)
+at org.testng.SuiteRunner.runTest(SuiteRunner.java:421)
+at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:413)
+at org.testng.SuiteRunner.privateRun(SuiteRunner.java:373)
+at org.testng.SuiteRunner.run(SuiteRunner.java:312)
+at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:95)
+at org.testng.TestNG.runSuitesSequentially(TestNG.java:1274)
+at org.testng.TestNG.runSuitesLocally(TestNG.java:1208)
+at org.testng.TestNG.runSuites(TestNG.java:1112)
+at org.testng.TestNG.run(TestNG.java:1079)
+at org.testng.remote.AbstractRemoteTestNG.run(AbstractRemoteTestNG.java:115)
+at org.testng.remote.RemoteTestNG.initAndRun(RemoteTestNG.java:293)
+at org.testng.remote.RemoteTestNG.main(RemoteTestNG.java:91)
+]]>
+            </full-stacktrace>
+          </exception> <!-- java.nio.file.NoSuchFileException -->
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- testKPNcall -->
+        <test-method is-config="true" signature="setUp()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@5cdec700]" started-at="2025-07-15T19:40:59 CEST" name="setUp" finished-at="2025-07-15T19:40:59 CEST" duration-ms="1" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method signature="testQuarantineDisabled()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@5cdec700]" started-at="2025-07-15T19:40:59 CEST" name="testQuarantineDisabled" finished-at="2025-07-15T19:41:00 CEST" duration-ms="893" status="FAIL">
+          <exception class="java.lang.AssertionError">
+            <message>
+              <![CDATA[Mail should be ghosted expected [ghost] but found [null]]]>
+            </message>
+            <full-stacktrace>
+              <![CDATA[java.lang.AssertionError: Mail should be ghosted expected [ghost] but found [null]
+at org.testng.Assert.fail(Assert.java:111)
+at org.testng.Assert.failNotEquals(Assert.java:1590)
+at org.testng.Assert.assertEqualsImpl(Assert.java:150)
+at org.testng.Assert.assertEquals(Assert.java:132)
+at org.testng.Assert.assertEquals(Assert.java:656)
+at com.kwee.james.mailets.KPNVeiligVirusScanTest.testQuarantineDisabled(KPNVeiligVirusScanTest.java:121)
+at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+at org.testng.internal.invokers.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:141)
+at org.testng.internal.invokers.TestInvoker.invokeMethod(TestInvoker.java:687)
+at org.testng.internal.invokers.TestInvoker.invokeTestMethod(TestInvoker.java:230)
+at org.testng.internal.invokers.MethodRunner.runInSequence(MethodRunner.java:63)
+at org.testng.internal.invokers.TestInvoker$MethodInvocationAgent.invoke(TestInvoker.java:995)
+at org.testng.internal.invokers.TestInvoker.invokeTestMethods(TestInvoker.java:203)
+at org.testng.internal.invokers.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:154)
+at org.testng.internal.invokers.TestMethodWorker.run(TestMethodWorker.java:134)
+at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+at org.testng.TestRunner.privateRun(TestRunner.java:741)
+at org.testng.TestRunner.run(TestRunner.java:616)
+at org.testng.SuiteRunner.runTest(SuiteRunner.java:421)
+at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:413)
+at org.testng.SuiteRunner.privateRun(SuiteRunner.java:373)
+at org.testng.SuiteRunner.run(SuiteRunner.java:312)
+at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:95)
+at org.testng.TestNG.runSuitesSequentially(TestNG.java:1274)
+at org.testng.TestNG.runSuitesLocally(TestNG.java:1208)
+at org.testng.TestNG.runSuites(TestNG.java:1112)
+at org.testng.TestNG.run(TestNG.java:1079)
+at org.testng.remote.AbstractRemoteTestNG.run(AbstractRemoteTestNG.java:115)
+at org.testng.remote.RemoteTestNG.initAndRun(RemoteTestNG.java:293)
+at org.testng.remote.RemoteTestNG.main(RemoteTestNG.java:91)
+]]>
+            </full-stacktrace>
+          </exception> <!-- java.lang.AssertionError -->
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- testQuarantineDisabled -->
+        <test-method is-config="true" signature="setUp()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@5cdec700]" started-at="2025-07-15T19:41:00 CEST" name="setUp" finished-at="2025-07-15T19:41:00 CEST" duration-ms="1" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method signature="testScanFailureShouldThrowException()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@5cdec700]" started-at="2025-07-15T19:41:00 CEST" name="testScanFailureShouldThrowException" finished-at="2025-07-15T19:41:00 CEST" duration-ms="15" status="FAIL">
+          <exception class="org.testng.TestException">
+            <message>
+              <![CDATA[
+Expected exception of type class jakarta.mail.MessagingException but got org.mockito.exceptions.base.MockitoException: 
+Checked exception is invalid for this method!
+Invalid: jakarta.mail.MessagingException: Scan error]]>
+            </message>
+            <full-stacktrace>
+              <![CDATA[org.testng.TestException: 
+Expected exception of type class jakarta.mail.MessagingException but got org.mockito.exceptions.base.MockitoException: 
+Checked exception is invalid for this method!
+Invalid: jakarta.mail.MessagingException: Scan error
+at org.testng.internal.invokers.ExpectedExceptionsHolder.wrongException(ExpectedExceptionsHolder.java:67)
+at org.testng.internal.invokers.TestInvoker.considerExceptionsInternal(TestInvoker.java:888)
+at org.testng.internal.invokers.TestInvoker.considerExceptions(TestInvoker.java:863)
+at org.testng.internal.invokers.TestInvoker.invokeMethod(TestInvoker.java:742)
+at org.testng.internal.invokers.TestInvoker.invokeTestMethod(TestInvoker.java:230)
+at org.testng.internal.invokers.MethodRunner.runInSequence(MethodRunner.java:63)
+at org.testng.internal.invokers.TestInvoker$MethodInvocationAgent.invoke(TestInvoker.java:995)
+at org.testng.internal.invokers.TestInvoker.invokeTestMethods(TestInvoker.java:203)
+at org.testng.internal.invokers.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:154)
+at org.testng.internal.invokers.TestMethodWorker.run(TestMethodWorker.java:134)
+at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+at org.testng.TestRunner.privateRun(TestRunner.java:741)
+at org.testng.TestRunner.run(TestRunner.java:616)
+at org.testng.SuiteRunner.runTest(SuiteRunner.java:421)
+at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:413)
+at org.testng.SuiteRunner.privateRun(SuiteRunner.java:373)
+at org.testng.SuiteRunner.run(SuiteRunner.java:312)
+at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:95)
+at org.testng.TestNG.runSuitesSequentially(TestNG.java:1274)
+at org.testng.TestNG.runSuitesLocally(TestNG.java:1208)
+at org.testng.TestNG.runSuites(TestNG.java:1112)
+at org.testng.TestNG.run(TestNG.java:1079)
+at org.testng.remote.AbstractRemoteTestNG.run(AbstractRemoteTestNG.java:115)
+at org.testng.remote.RemoteTestNG.initAndRun(RemoteTestNG.java:293)
+at org.testng.remote.RemoteTestNG.main(RemoteTestNG.java:91)
+Caused by: org.mockito.exceptions.base.MockitoException: 
+Checked exception is invalid for this method!
+Invalid: jakarta.mail.MessagingException: Scan error
+at com.kwee.james.mailets.KPNVeiligVirusScan.scanFileWithKPNVScan(KPNVeiligVirusScan.java:79)
+at com.kwee.james.mailets.KPNVeiligVirusScanTest.testScanFailureShouldThrowException(KPNVeiligVirusScanTest.java:100)
+at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+at org.testng.internal.invokers.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:141)
+at org.testng.internal.invokers.TestInvoker.invokeMethod(TestInvoker.java:687)
+... 22 more
+]]>
+            </full-stacktrace>
+          </exception> <!-- org.testng.TestException -->
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- testScanFailureShouldThrowException -->
+      </class> <!-- com.kwee.james.mailets.KPNVeiligVirusScanTest -->
+    </test> <!-- Default test -->
+  </suite> <!-- Default suite -->
+</testng-results>

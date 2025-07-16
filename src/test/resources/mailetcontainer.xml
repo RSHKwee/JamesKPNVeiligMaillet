@@ -1,0 +1,10 @@
+<mailet match="All" class="com.kwee.james.mailets.KPNVeiligVirusScan">
+    <kpnVeiligPath>"C:\Program Files\F-Secure\Anti-Virus\fsscan.exe"</kpnVeiligPath>
+    <tmpDir>C:\James\temp</tmpDir>
+    <quarantine>true</quarantine>
+    <quarantineDir>C:\James\quarantine</quarantineDir>
+    <scanTimeout>60000</scanTimeout> <!-- 60 seconden timeout -->
+    
+    <!-- Optionele parameters -->
+    <!-- <additionalParams>/VERBOSE /LOG=C:\James\logs\kpnveilig.log</additionalParams> -->
+</mailet>
