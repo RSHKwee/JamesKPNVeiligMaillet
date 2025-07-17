@@ -197,7 +197,7 @@ public class KPNVeiligVirusScanTest {
     LOGGER.info("testKPNcall");
 
     Path zipPath = Paths.get("resources\\eicar_com.zip");
-
+    FileSystem zipFs1 = FileSystems.newFileSystem(zipPath, (ClassLoader) null);
     // Create a filesystem for the ZIP file
     try (FileSystem zipFs = FileSystems.newFileSystem(zipPath, (ClassLoader) null)) {
       // Get path to entry inside the ZIP

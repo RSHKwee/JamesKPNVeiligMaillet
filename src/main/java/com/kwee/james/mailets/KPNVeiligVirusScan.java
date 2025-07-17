@@ -80,9 +80,9 @@ public class KPNVeiligVirusScan extends GenericMailet {
         // "/ARCHIVE", // Scan binnen archives
         // "/DELETE", // Verwijder geïnfecteerde bestanden
         // "/REPORT=XML", // XML-formaat voor parsing
-        file.toString());
+        file.toAbsolutePath().toString());
 // "C:\Program Files (x86)\KPN Veilig\fsscan.exe" "%FILE%"
-    LOGGER.debug("Commandline: " + pb.command().toString() + " " + fileExists(file));
+    LOGGER.debug("Commandline: " + pb.command().toString() + " " + file.toAbsolutePath().toString());
     pb.redirectErrorStream(true);
     pb.inheritIO();
     try {
@@ -145,13 +145,4 @@ public class KPNVeiligVirusScan extends GenericMailet {
     return "KPN Veilig Antivirus Scanner Mailet (fsscan.exe)";
   }
 
-  String fileExists(Path path) {
-    if (Files.exists(path) && Files.isRegularFile(path)) {
-      return "Het bestand bestaat en is een normaal bestand.";
-    } else if (Files.exists(path) && Files.isDirectory(path)) {
-      return "Het pad verwijst naar een directory, niet naar een bestand.";
-    } else {
-      return "Het bestand bestaat niet.";
-    }
-  }
 }
