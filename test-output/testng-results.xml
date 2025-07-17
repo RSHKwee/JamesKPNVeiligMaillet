@@ -2,16 +2,16 @@
 <testng-results ignored="0" total="6" passed="1" failed="5" skipped="0">
   <reporter-output>
   </reporter-output>
-  <suite started-at="2025-07-17T14:56:07 CEST" name="Default suite" finished-at="2025-07-17T14:56:10 CEST" duration-ms="2429">
+  <suite started-at="2025-07-17T15:05:41 CEST" name="Default suite" finished-at="2025-07-17T15:05:42 CEST" duration-ms="1477">
     <groups>
     </groups>
-    <test started-at="2025-07-17T14:56:07 CEST" name="Default test" finished-at="2025-07-17T14:56:10 CEST" duration-ms="2429">
+    <test started-at="2025-07-17T15:05:41 CEST" name="Default test" finished-at="2025-07-17T15:05:42 CEST" duration-ms="1477">
       <class name="com.kwee.james.mailets.KPNVeiligVirusScanTest">
-        <test-method is-config="true" signature="setUp()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T14:56:07 CEST" name="setUp" finished-at="2025-07-17T14:56:08 CEST" duration-ms="868" status="PASS">
+        <test-method is-config="true" signature="setUp()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T15:05:41 CEST" name="setUp" finished-at="2025-07-17T15:05:42 CEST" duration-ms="864" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setUp -->
-        <test-method signature="testCleanMailShouldContinueProcessing()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T14:56:08 CEST" name="testCleanMailShouldContinueProcessing" finished-at="2025-07-17T14:56:09 CEST" duration-ms="1226" status="FAIL">
+        <test-method signature="testCleanMailShouldContinueProcessing()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T15:05:42 CEST" name="testCleanMailShouldContinueProcessing" finished-at="2025-07-17T15:05:42 CEST" duration-ms="328" status="FAIL">
           <exception class="org.mockito.exceptions.base.MockitoException">
             <message>
               <![CDATA[
@@ -131,11 +131,11 @@ at org.mockito.internal.creation.bytebuddy.InlineBytecodeGenerator.triggerRetran
           <reporter-output>
           </reporter-output>
         </test-method> <!-- testCleanMailShouldContinueProcessing -->
-        <test-method is-config="true" signature="setUp()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T14:56:09 CEST" name="setUp" finished-at="2025-07-17T14:56:09 CEST" duration-ms="2" status="PASS">
+        <test-method is-config="true" signature="setUp()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T15:05:42 CEST" name="setUp" finished-at="2025-07-17T15:05:42 CEST" duration-ms="1" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setUp -->
-        <test-method signature="testInfectedMailShouldBeQuarantined()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T14:56:09 CEST" name="testInfectedMailShouldBeQuarantined" finished-at="2025-07-17T14:56:10 CEST" duration-ms="79" status="FAIL">
+        <test-method signature="testInfectedMailShouldBeQuarantined()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T15:05:42 CEST" name="testInfectedMailShouldBeQuarantined" finished-at="2025-07-17T15:05:42 CEST" duration-ms="75" status="FAIL">
           <exception class="org.mockito.exceptions.base.MockitoException">
             <message>
               <![CDATA[
@@ -255,19 +255,19 @@ at org.mockito.internal.creation.bytebuddy.InlineBytecodeGenerator.triggerRetran
           <reporter-output>
           </reporter-output>
         </test-method> <!-- testInfectedMailShouldBeQuarantined -->
-        <test-method is-config="true" signature="setUp()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T14:56:10 CEST" name="setUp" finished-at="2025-07-17T14:56:10 CEST" duration-ms="2" status="PASS">
+        <test-method is-config="true" signature="setUp()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T15:05:42 CEST" name="setUp" finished-at="2025-07-17T15:05:42 CEST" duration-ms="1" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setUp -->
-        <test-method signature="testInitShouldCreateDirectories()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T14:56:10 CEST" name="testInitShouldCreateDirectories" finished-at="2025-07-17T14:56:10 CEST" duration-ms="4" status="PASS">
+        <test-method signature="testInitShouldCreateDirectories()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T15:05:42 CEST" name="testInitShouldCreateDirectories" finished-at="2025-07-17T15:05:42 CEST" duration-ms="3" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- testInitShouldCreateDirectories -->
-        <test-method is-config="true" signature="setUp()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T14:56:10 CEST" name="setUp" finished-at="2025-07-17T14:56:10 CEST" duration-ms="2" status="PASS">
+        <test-method is-config="true" signature="setUp()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T15:05:42 CEST" name="setUp" finished-at="2025-07-17T15:05:42 CEST" duration-ms="1" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setUp -->
-        <test-method signature="testKPNcall()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T14:56:10 CEST" name="testKPNcall" finished-at="2025-07-17T14:56:10 CEST" duration-ms="16" status="FAIL">
+        <test-method signature="testKPNcall()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T15:05:42 CEST" name="testKPNcall" finished-at="2025-07-17T15:05:42 CEST" duration-ms="14" status="FAIL">
           <exception class="java.nio.file.NoSuchFileException">
             <message>
               <![CDATA[resources\eicar_com.zip]]>
@@ -312,11 +312,11 @@ at org.testng.remote.RemoteTestNG.main(RemoteTestNG.java:91)
           <reporter-output>
           </reporter-output>
         </test-method> <!-- testKPNcall -->
-        <test-method is-config="true" signature="setUp()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T14:56:10 CEST" name="setUp" finished-at="2025-07-17T14:56:10 CEST" duration-ms="1" status="PASS">
+        <test-method is-config="true" signature="setUp()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T15:05:42 CEST" name="setUp" finished-at="2025-07-17T15:05:42 CEST" duration-ms="1" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setUp -->
-        <test-method signature="testQuarantineDisabled()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T14:56:10 CEST" name="testQuarantineDisabled" finished-at="2025-07-17T14:56:10 CEST" duration-ms="74" status="FAIL">
+        <test-method signature="testQuarantineDisabled()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T15:05:42 CEST" name="testQuarantineDisabled" finished-at="2025-07-17T15:05:42 CEST" duration-ms="55" status="FAIL">
           <exception class="org.mockito.exceptions.base.MockitoException">
             <message>
               <![CDATA[
@@ -436,11 +436,11 @@ at org.mockito.internal.creation.bytebuddy.InlineBytecodeGenerator.triggerRetran
           <reporter-output>
           </reporter-output>
         </test-method> <!-- testQuarantineDisabled -->
-        <test-method is-config="true" signature="setUp()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T14:56:10 CEST" name="setUp" finished-at="2025-07-17T14:56:10 CEST" duration-ms="2" status="PASS">
+        <test-method is-config="true" signature="setUp()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T15:05:42 CEST" name="setUp" finished-at="2025-07-17T15:05:42 CEST" duration-ms="2" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setUp -->
-        <test-method signature="testScanFailureShouldThrowException()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T14:56:10 CEST" name="testScanFailureShouldThrowException" finished-at="2025-07-17T14:56:10 CEST" duration-ms="60" status="FAIL">
+        <test-method signature="testScanFailureShouldThrowException()[pri:0, instance:com.kwee.james.mailets.KPNVeiligVirusScanTest@4470fbd6]" started-at="2025-07-17T15:05:42 CEST" name="testScanFailureShouldThrowException" finished-at="2025-07-17T15:05:42 CEST" duration-ms="56" status="FAIL">
           <exception class="org.testng.TestException">
             <message>
               <![CDATA[
