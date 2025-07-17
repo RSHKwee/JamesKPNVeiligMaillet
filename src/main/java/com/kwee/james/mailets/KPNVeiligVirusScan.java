@@ -31,9 +31,13 @@ public class KPNVeiligVirusScan extends GenericMailet {
    * "C:\Program Files (x86)\KPN Veilig\fsscan.exe" "%FILE%" Returncode = 3 virus
    * found
    */
+  /**
+   * Initialize configuration parameters
+   * 
+   * @throws MailetException
+   */
   @Override
   public void init() throws MailetException {
-    // Configuratie parameters
     tmpDir = Paths.get(getInitParameter("tmpDir", "C:\\James\\temp"));
     kpnVeiligPath = getInitParameter("kpnVeiligPath", "C:\\Program Files (x86)\\KPN Veilig\\fsscan.exe");
     quarantineEnabled = Boolean.parseBoolean(getInitParameter("quarantine", "true"));
@@ -50,6 +54,11 @@ public class KPNVeiligVirusScan extends GenericMailet {
     }
   }
 
+  /**
+   * 
+   * @param mail
+   * @throws MessagingException
+   */
   @Override
   public void service(Mail mail) throws MessagingException {
     try {
@@ -60,7 +69,7 @@ public class KPNVeiligVirusScan extends GenericMailet {
         mail.getMessage().writeTo(out);
       }
 
-      // Voer F-KPN Veilig scan uit
+      // Perform scan
       boolean infected = scanFileWithKPNVScan(tempFile);
 
       if (infected) {
@@ -68,43 +77,51 @@ public class KPNVeiligVirusScan extends GenericMailet {
         handleInfected(mail, tempFile);
       } else {
         LOGGER.debug("KPN Veilig output: " + tempFile.toString());
-        // Files.delete(tempFile);
+        Files.delete(tempFile);
       }
     } catch (IOException e) {
       throw new MessagingException("Scan failed", e);
     }
   }
 
+  /**
+   * Scan file for virus
+   * 
+   * @param file File to scan
+   * @return false: No virus found, true A virus is found
+   * @throws IOException     IO Exception
+   * @throws MailetException Mailet exception
+   */
   public boolean scanFileWithKPNVScan(Path file) throws IOException, MailetException {
-    ProcessBuilder pb = new ProcessBuilder(kpnVeiligPath,
-        // "/ARCHIVE", // Scan binnen archives
-        // "/DELETE", // Verwijder geïnfecteerde bestanden
-        // "/REPORT=XML", // XML-formaat voor parsing
-        file.toAbsolutePath().toString());
-// "C:\Program Files (x86)\KPN Veilig\fsscan.exe" "%FILE%"
-    LOGGER.debug("Commandline: " + pb.command().toString() + " " + file.toAbsolutePath().toString());
+    ProcessBuilder pb = new ProcessBuilder(kpnVeiligPath, file.toAbsolutePath().toString());
+
     pb.redirectErrorStream(true);
-    pb.inheritIO();
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Commandline: " + pb.command().toString() + " " + file.toAbsolutePath().toString());
+      pb.inheritIO();
+    }
+
     try {
       Process process = pb.start();
       int procexit = process.waitFor();
       LOGGER.debug("Procexit result: " + procexit);
-      // Wacht met timeout
+
+      // Wait with timeout
       if (!process.waitFor(scanTimeout, TimeUnit.MILLISECONDS)) {
         process.destroyForcibly();
         throw new MailetException("KPN Veilig scan timeout exceeded");
       }
 
       // Parse exit code:
-      // 0 = schoon, 1 = geïnfecteerd, andere codes = fout
+      // 0 = clean, 3 = infected, other codes = error
       int exitCode = process.exitValue();
-      LOGGER.info("Scan result: " + exitCode);
+      LOGGER.debug("Scan result: " + exitCode);
 
       if (exitCode > 1) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
           String line;
           while ((line = reader.readLine()) != null) {
-            LOGGER.warn("KPN Veilig output: " + line);
+            LOGGER.debug("KPN Veilig output: " + line);
           }
         }
         throw new MailetException("KPN Veilig scan failed with code: " + exitCode);
@@ -117,14 +134,19 @@ public class KPNVeiligVirusScan extends GenericMailet {
     }
   }
 
+  /**
+   * Handle a mail with a virus. By sending a notification, create a new mai with
+   * use of the mailet context.
+   *
+   * @param mail Mail with virus
+   * @param file Temporary copy of mail on disk.
+   * @throws MessagingException Message exception
+   */
   private void handleInfected(Mail mail, Path file) throws MessagingException {
-    // Stuur notificatie
-    // Maak een nieuwe error mail
-    // Gebruik de mailet context direct
     mail.setErrorMessage("The attached email contained a virus and was blocked.");
     getMailetContext().sendMail(mail);
 
-    // Quarantaine indien geconfigureerd
+    // Quarantaine when configured
     if (quarantineEnabled) {
       try {
         String quarantineFileName = "infected-" + System.currentTimeMillis() + ".eml";
@@ -134,12 +156,21 @@ public class KPNVeiligVirusScan extends GenericMailet {
       } catch (IOException e) {
         throw new MessagingException("Quarantine failed", e);
       }
+    } else {
+      try {
+        Files.delete(file);
+      } catch (IOException e) {
+        // do nothing
+      }
     }
 
-    // Stop verdere verwerking
+    // Stop processing
     mail.setState(Mail.GHOST);
   }
 
+  /**
+   * Give mailet information.
+   */
   @Override
   public String getMailetInfo() {
     return "KPN Veilig Antivirus Scanner Mailet (fsscan.exe)";
