@@ -10,7 +10,6 @@ import static org.testng.Assert.assertNull;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -42,13 +41,9 @@ public class KPNVeiligVirusScanTest {
   public void setUp() throws Exception {
     mailet = new KPNVeiligVirusScan();
     mailetContext = mock(MailetContext.class);
-    mailetConfig = FakeMailetConfig.builder()
-        .mailetName("KPNVeiligScan")
-        .mailetContext(mailetContext)
+    mailetConfig = FakeMailetConfig.builder().mailetName("KPNVeiligScan").mailetContext(mailetContext)
         .setProperty("kpnVeiligPath", "C:\\Program Files (x86)\\KPN Veilig\\fsscan.exe")
-        .setProperty("tmpDir", "target\\tmp")
-        .setProperty("quarantineDir", "target/quarantine")
-        .build();
+        .setProperty("tmpDir", "target\\tmp").setProperty("quarantineDir", "target/quarantine").build();
   }
 
   @Test
@@ -211,7 +206,7 @@ public class KPNVeiligVirusScanTest {
 
       // File testfile = new File("target/tmp/ecar.eml");
       // Path pad = testfile.toPath();
-      LOGGER.debug("File:  " + fileExists(entryPath));
+      LOGGER.debug("File:  " + entryPath.toAbsolutePath().toString());
 
       KPNVeiligVirusScan spyMailet = spy(mailet);
 
@@ -228,13 +223,4 @@ public class KPNVeiligVirusScanTest {
     return reverse(str.substring(1)) + str.charAt(0);
   }
 
-  String fileExists(Path path) {
-    if (Files.exists(path) && Files.isRegularFile(path)) {
-      return "Het bestand bestaat en is een normaal bestand.";
-    } else if (Files.exists(path) && Files.isDirectory(path)) {
-      return "Het pad verwijst naar een directory, niet naar een bestand.";
-    } else {
-      return "Het bestand bestaat niet.";
-    }
-  }
 }

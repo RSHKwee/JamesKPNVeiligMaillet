@@ -1,7 +1,6 @@
 package sandbox;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,6 +10,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -39,53 +39,39 @@ public class CopyFileContent {
     MailetContext mailetContext;
     FakeMailetConfig mailetConfig;
 
+    Path tempPath = Paths.get(System.getProperty("java.io.tmpdir"));
+
     Path zipPath = Paths.get("F:\\dev\\James Mailets\\JamesKPNVeiligMaillet\\src\\test\\resources\\eicar_com.zip");
     // Path zipPath = Paths.get("D:\\Dev\\Github\\James
     // Maillets\\KPNVeilig\\src\\test\\resources\\eicar_com.zip");
     // Path sourcePath = Paths.get("bronbestand.txt");
     String gezipt = "eicar.com";
-    String geziptDir = "target\\";
+    String geziptDir = tempPath.toAbsolutePath().toString();
     Path destinationPath = Paths.get(geziptDir + gezipt);
-    Path entryPath = null;
 
-    // Create a filesystem for the ZIP file
-    try (FileSystem zipFs = FileSystems.newFileSystem(zipPath, (ClassLoader) null)) {
-      // Get path to entry inside the ZIP
-      entryPath = zipFs.getPath(gezipt);
-
-      // Now you can use standard Files methods
-      if (Files.exists(entryPath)) {
-        // LOGGER.info("Entry path in ZIP: " + entryPath);
-        LOGGER.info("Entry path in ZIP: " + entryPath + " Size: " + Files.size(entryPath) + " bytes");
-
-        // Read content directly
-        List<String> lines = Files.readAllLines(entryPath);
-        // LOGGER.info("First line: " + lines.get(0));
-
-        Files.write(destinationPath, lines);
-
-        LOGGER.info("Bestand succesvol gekopieerd naar: " + destinationPath.toAbsolutePath());
-      }
-    } catch (IOException e) {
-      LOGGER.error("Fout: " + e.getMessage());
-    }
+    destinationPath = GetZippedFile(zipPath, geziptDir, gezipt);
 
     try {
       mailetContext = mock(MailetContext.class);
-      mailetConfig = FakeMailetConfig.builder().mailetName("KPNVeiligScan").mailetContext(mailetContext)
+      //@formatter:off
+      mailetConfig = FakeMailetConfig.builder()
+          .mailetName("KPNVeiligScan").mailetContext(mailetContext)
           .setProperty("kpnVeiligPath", "C:\\Program Files (x86)\\KPN Veilig\\fsscan.exe")
-          .setProperty("tmpDir", "target/tmp").setProperty("quarantineDir", "target/quarantine").build();
+          .setProperty("tmpDir", tempPath.toAbsolutePath().toString())
+          .setProperty("quarantineDir", "target/quarantine")
+          .build();
+      //@formatter:on
+//      Mail mail = createInfectedMail();
+//      mailet = new KPNVeiligVirusScan();
+//      mailet.init(mailetConfig);
+//      KPNVeiligVirusScan spyMailet = spy(mailet);
+//      spyMailet.service(mail);
 
-      Mail mail = createInfectedMail();
-      mailet = new KPNVeiligVirusScan();
-      mailet.init(mailetConfig);
-      KPNVeiligVirusScan spyMailet = spy(mailet);
-      spyMailet.service(mail);
-
-      // boolean result = scanFileWithKPNVScan(destinationPath);
-      // LOGGER.info("Scanresult: " + result);
-    } catch (MessagingException e) {
+      boolean result = scanFileWithKPNVScan(destinationPath);
+      LOGGER.info("Scanresult: " + result);
+    } catch (Exception e) {
       // TODO Auto-generated catch block
+      LOGGER.error(e.getMessage());
       e.printStackTrace();
     }
   }
@@ -169,10 +155,14 @@ public class CopyFileContent {
 
       // 5. Maak het Mail object
       Mail mail;
-
-      mail = FakeMail.builder().name("virus-test-mail").mimeMessage(mimeMessage).sender("sender@domain.com")
-          .recipient("recipient@domain.com").build();
-
+      //@formatter:off
+      mail = FakeMail.builder()
+          .name("virus-test-mail")
+          .mimeMessage(mimeMessage)
+          .sender("sender@domain.com")
+          .recipient("recipient@domain.com")
+          .build();
+      //@formatter:on
       return mail;
     } catch (Exception e) {
       // TODO Auto-generated catch block
@@ -180,6 +170,45 @@ public class CopyFileContent {
       LOGGER.info(e.getMessage().toString());
     }
     return null;
+  }
+
+  static private Path GetZippedFile(Path zipPath, String a_DestDir, String a_ZippedFile) {
+    String gezipt = a_ZippedFile;
+    String geziptDir = a_DestDir;
+    Path destinationPath = Paths.get(geziptDir + "\\" + gezipt);
+    // Path destinationPath = Paths.get("f:\\dev" + "\\" + gezipt);
+    Path entryPath = null;
+
+    // Create a filesystem for the ZIP file
+    try (FileSystem zipFs = FileSystems.newFileSystem(zipPath, (ClassLoader) null)) {
+      // Get path to entry inside the ZIP
+      entryPath = zipFs.getPath(gezipt);
+
+      // Now you can use standard Files methods
+      if (Files.exists(entryPath)) {
+        LOGGER.info("Entry path in ZIP: " + entryPath + " Size: " + Files.size(entryPath) + " bytes");
+
+        // Read content directly
+        List<String> lines = Files.readAllLines(entryPath);
+        // LOGGER.info("First line: " + lines.get(0));
+
+        Path tempPath = Paths.get(System.getProperty("java.io.tmpdir"), "test.txt");
+        Files.write(tempPath, lines);
+
+        // Files.write(destinationPath, lines);
+        // @formatter:off
+        Files.write(destinationPath, lines, 
+            StandardOpenOption.CREATE, 
+            StandardOpenOption.TRUNCATE_EXISTING,
+            StandardOpenOption.WRITE);
+        // @formatter:on
+        LOGGER.info("Bestand succesvol gekopieerd naar: " + destinationPath.toAbsolutePath());
+      }
+    } catch (IOException e) {
+      LOGGER.error("Fout: " + e.getCause());
+      LOGGER.error("Fout: " + e.getMessage());
+    }
+    return destinationPath;
   }
 
   static private String reverse(String str) {
