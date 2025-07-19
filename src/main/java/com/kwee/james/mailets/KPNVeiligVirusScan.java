@@ -1,5 +1,8 @@
 package com.kwee.james.mailets;
 
+/**
+ * Package KPN Virus scan on Windows.
+ */
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -28,11 +31,10 @@ public class KPNVeiligVirusScan extends GenericMailet {
   private int scanTimeout;
 
   /*
-   * "C:\Program Files (x86)\KPN Veilig\fsscan.exe" "%FILE%" Returncode = 3 virus
-   * found
    */
   /**
-   * Initialize configuration parameters
+   * Initialize configuration parameters Additional info: "C:\Program Files
+   * (x86)\KPN Veilig\fsscan.exe" "%FILE%" Returncode = 3 virus found
    * 
    * @throws MailetException
    */
@@ -55,8 +57,9 @@ public class KPNVeiligVirusScan extends GenericMailet {
   }
 
   /**
+   * Perform service
    * 
-   * @param mail
+   * @param mail Mail to be scanned
    * @throws MessagingException
    */
   @Override
@@ -77,7 +80,9 @@ public class KPNVeiligVirusScan extends GenericMailet {
         handleInfected(mail, tempFile);
       } else {
         LOGGER.debug("KPN Veilig output: " + tempFile.toString());
-        Files.delete(tempFile);
+        if (!LOGGER.isDebugEnabled()) {
+          Files.delete(tempFile);
+        }
       }
     } catch (IOException e) {
       throw new MessagingException("Scan failed", e);
@@ -157,10 +162,12 @@ public class KPNVeiligVirusScan extends GenericMailet {
         throw new MessagingException("Quarantine failed", e);
       }
     } else {
-      try {
-        Files.delete(file);
-      } catch (IOException e) {
-        // do nothing
+      if (!LOGGER.isDebugEnabled()) {
+        try {
+          Files.delete(file);
+        } catch (IOException e) {
+          // do nothing
+        }
       }
     }
 

@@ -1,10 +1,12 @@
 package sandbox;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -12,13 +14,20 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.james.core.builder.MimeMessageBuilder;
 import org.apache.mailet.Mail;
@@ -61,18 +70,18 @@ public class CopyFileContent {
           .setProperty("quarantineDir", "target/quarantine")
           .build();
       //@formatter:on
-//      Mail mail = createInfectedMail();
-//      mailet = new KPNVeiligVirusScan();
-//      mailet.init(mailetConfig);
-//      KPNVeiligVirusScan spyMailet = spy(mailet);
-//      spyMailet.service(mail);
+      Mail mail = createInfectedMail();
+      mailet = new KPNVeiligVirusScan();
+      mailet.init(mailetConfig);
+      KPNVeiligVirusScan spyMailet = spy(mailet);
+      spyMailet.service(mail);
 
-      boolean result = scanFileWithKPNVScan(destinationPath);
-      LOGGER.info("Scanresult: " + result);
+      // boolean result = scanFileWithKPNVScan(destinationPath);
+      // LOGGER.info("Scanresult: " + result);
     } catch (Exception e) {
       // TODO Auto-generated catch block
       LOGGER.error(e.getMessage());
-      e.printStackTrace();
+      // e.printStackTrace();
     }
   }
 
@@ -116,44 +125,40 @@ public class CopyFileContent {
     }
   }
 
-  // " *H+H$!ELIF-TSET-SURIVITNA-DRADNATS-RACIE$}7)CC7)^P(45XZP\\4[PA@%P!O5X";
   static private Mail createInfectedMail() throws MessagingException, IOException {
+    Properties props = new Properties();
+    Session session = Session.getInstance(props);
+
     // 1. Maak een MimeMessage
-    MimeMessage mimeMessage;
+    MimeMessage mimeMessage = new MimeMessage(session);
     try {
-      // String eicar =
-      // "X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*";
-      String eicar = reverse("*H+H$!ELIF-TSET-SURIVITNA-DRADNATS-RACIE$}7)CC7)^P(45XZP\\4[PA@%P!O5X");
-
-      mimeMessage = MimeMessageBuilder.mimeMessageBuilder().setSubject("Test: EICAR Virus Test File")
-          .setText("Hello world!").build();
-
-      // 2. Stel basis headers in
-      mimeMessage.setFrom("sender@example.com");
-      mimeMessage.setRecipients(javax.mail.Message.RecipientType.TO, "recipient@example.com");
+      // 2. Stel headers in
+      mimeMessage.setHeader("Date", "Fri, 18 Jul 2025 14:14:03 +0200 (CEST)");
+      mimeMessage.setHeader("Message-ID", "<1601756706.0.1752840843239>");
       mimeMessage.setSubject("Test: EICAR Virus Test File");
+      mimeMessage.setFrom(new InternetAddress("sender@example.com"));
+      mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress("recipient@example.com"));
+      mimeMessage.setHeader("MIME-Version", "1.0");
 
-      // 3. Maak multipart bericht met tekst en bijlage
-      MimeMultipart multipart = new MimeMultipart();
+      // 3. Maak een multipart-bericht met boundary
+      MimeMultipart multipart = new MimeMultipart("mixed");
+      multipart.setSubType("mixed");
 
-      // 3a. Tekstgedeelte
-      MimeBodyPart textPart = new MimeBodyPart();
-      textPart.setText("Dit is een testmail met een veilig testvirus als bijlage.");
-      multipart.addBodyPart(textPart);
-
-      // 3b. EICAR bijlage
+      // 4. Voeg de EICAR-bijlage toe
       MimeBodyPart attachmentPart = new MimeBodyPart();
+      String eicarContent = reverse("*H+H$!ELIF-TSET-SURIVITNA-DRADNATS-RACIE$}7)CC7)^P(45XZP\\4[PA@%P!O5X");
 
-      // Maak datasource voor de bijlage
-      ByteArrayDataSource ds = new ByteArrayDataSource(eicar.getBytes(), "application/octet-stream");
-      attachmentPart.setDataHandler(new javax.activation.DataHandler(ds));
+      attachmentPart.setContent(eicarContent, "application/octet-stream");
       attachmentPart.setFileName("eicar.com");
+      attachmentPart.setHeader("Content-ID", "<c6d1e995-d4ac-4ab9-8b50-7f4568b9c499>");
       multipart.addBodyPart(attachmentPart);
 
-      // 4. Zet de content in het bericht
       mimeMessage.setContent(multipart);
 
-      // 5. Maak het Mail object
+      // 5. Schrijf het bericht naar een bestand (of verstuur het)
+      mimeMessage.writeTo(System.out); // Print naar console (of gebruik FileOutputStream)
+
+      // 6. Maak het Mail object
       Mail mail;
       //@formatter:off
       mail = FakeMail.builder()
@@ -163,10 +168,16 @@ public class CopyFileContent {
           .recipient("recipient@domain.com")
           .build();
       //@formatter:on
+
+      Path tempPath = Paths.get(System.getProperty("java.io.tmpdir"));
+      Path tempFile = Files.createTempFile(tempPath, "scan-", ".eml");
+      try (OutputStream out = Files.newOutputStream(tempFile)) {
+        mail.getMessage().writeTo(out);
+      }
+      LOGGER.debug("Virusmail File: " + tempFile.toAbsolutePath().toString());
+
       return mail;
     } catch (Exception e) {
-      // TODO Auto-generated catch block
-      // e.printStackTrace();
       LOGGER.info(e.getMessage().toString());
     }
     return null;
@@ -176,7 +187,6 @@ public class CopyFileContent {
     String gezipt = a_ZippedFile;
     String geziptDir = a_DestDir;
     Path destinationPath = Paths.get(geziptDir + "\\" + gezipt);
-    // Path destinationPath = Paths.get("f:\\dev" + "\\" + gezipt);
     Path entryPath = null;
 
     // Create a filesystem for the ZIP file
@@ -209,6 +219,57 @@ public class CopyFileContent {
       LOGGER.error("Fout: " + e.getMessage());
     }
     return destinationPath;
+  }
+
+  static private Mail createInfectedMailNew() throws MessagingException, IOException {
+    // 1. Maak een MimeMessage
+    MimeMessage mimeMessage;
+    //@formatter:off
+    mimeMessage = MimeMessageBuilder
+        .mimeMessageBuilder()
+        .setSubject("Test: EICAR Virus Test File")
+        .setText("Hello world!")
+        .build();
+    //@formatter:on
+
+    // 2. Base headers
+    mimeMessage.setFrom("sender@example.com");
+    mimeMessage.setRecipients(javax.mail.Message.RecipientType.TO, "recipient@example.com");
+
+    MimeBodyPart messageBodyPart = new MimeBodyPart();
+    Multipart multipart = new MimeMultipart();
+
+    // Create file
+    Path zipPath = Paths.get("F:\\dev\\James Mailets\\JamesKPNVeiligMaillet\\src\\test\\resources\\eicar_com.zip");
+    Path tempPath = Paths.get(System.getProperty("java.io.tmpdir"));
+
+    String gezipt = "eicar.com";
+    String geziptDir = tempPath.toAbsolutePath().toString();
+    Path destinationPath = Paths.get(geziptDir + gezipt);
+
+    destinationPath = GetZippedFile(zipPath, geziptDir, gezipt);
+
+    String file = destinationPath.toAbsolutePath().toString();
+    String fileName = gezipt;
+
+    DataSource source = new FileDataSource(file);
+    messageBodyPart.setDataHandler(new DataHandler(source));
+    messageBodyPart.setFileName(fileName);
+    multipart.addBodyPart(messageBodyPart);
+
+    mimeMessage.setContent(multipart);
+
+    // 5. Create Mail object
+    Mail mail;
+    //@formatter:off
+    mail = FakeMail.builder()
+      .name("virus-test-mail")
+      .mimeMessage(mimeMessage)
+      .sender("sender@domain.com")
+      .recipient("recipient@domain.com")
+      .build();
+    //@formatter:on
+    return mail;
   }
 
   static private String reverse(String str) {
