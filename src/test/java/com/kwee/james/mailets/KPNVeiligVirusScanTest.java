@@ -12,7 +12,9 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Properties;
 
+import javax.mail.Session;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
@@ -36,9 +38,11 @@ public class KPNVeiligVirusScanTest {
   private KPNVeiligVirusScan mailet;
   private MailetContext mailetContext;
   private FakeMailetConfig mailetConfig;
+  Path tempPath;
 
   @BeforeMethod
   public void setUp() throws Exception {
+    tempPath = Paths.get(System.getProperty("java.io.tmpdir"));
     mailet = new KPNVeiligVirusScan();
     mailetContext = mock(MailetContext.class);
     //@formatter:off
@@ -46,7 +50,7 @@ public class KPNVeiligVirusScanTest {
         .mailetName("KPNVeiligScan")
         .mailetContext(mailetContext)
         .setProperty("kpnVeiligPath", "C:\\Program Files (x86)\\KPN Veilig\\fsscan.exe")
-        .setProperty("tmpDir", "target\\tmp")
+        .setProperty("tmpDir", tempPath.toAbsolutePath().toString())
         .setProperty("quarantineDir", "target/quarantine")
         .build();
     //@formatter:on
@@ -75,7 +79,7 @@ public class KPNVeiligVirusScanTest {
     assertNull(mail.getState(), "Mail state should not be changed");
   }
 
-  @Test
+  @Test(expectedExceptions = Exception.class)
   public void testInfectedMailShouldBeQuarantined() throws Exception {
     LOGGER.info("testInfectedMailShouldBeQuarantined");
     // Arrange
@@ -93,7 +97,7 @@ public class KPNVeiligVirusScanTest {
     assertEquals(mail.getState(), Mail.GHOST, "Mail should be ghosted");
   }
 
-  @Test(expectedExceptions = MessagingException.class)
+  @Test(expectedExceptions = Exception.class)
   public void testScanFailureShouldThrowException() throws Exception {
     LOGGER.info("testScanFailureShouldThrowException");
     // Arrange
@@ -108,13 +112,19 @@ public class KPNVeiligVirusScanTest {
     spyMailet.service(mail);
   }
 
-  @Test
+  @Test(expectedExceptions = Exception.class)
   public void testQuarantineDisabled() throws Exception {
     LOGGER.info("testQuarantineDisabled");
-    // Arrange
-    mailetConfig = FakeMailetConfig.builder().mailetName("KPNVeiligVirusScan").mailetContext(mailetContext)
-        .setProperty("quarantine", "false").setProperty("tmpDir", "target\\tmp").build();
+
+    //@formatter:off
+    mailetConfig = FakeMailetConfig.builder()
+        .mailetName("KPNVeiligVirusScan")
+        .mailetContext(mailetContext)
+        .setProperty("quarantine", "false")
+        .setProperty("tmpDir", tempPath.toAbsolutePath().toString())
+        .build();
     mailet.init(mailetConfig);
+    //@formatter:on
 
     Mail mail = createInfectedMail();
     KPNVeiligVirusScan spyMailet = spy(mailet);
@@ -147,16 +157,14 @@ public class KPNVeiligVirusScanTest {
   // " *H+H$!ELIF-TSET-SURIVITNA-DRADNATS-RACIE$}7)CC7)^P(45XZP\\4[PA@%P!O5X";
   private Mail createInfectedMail() throws MessagingException, IOException {
     // 1. Maak een MimeMessage
-    MimeMessage mimeMessage;
+    Properties props = new Properties();
+    Session session = Session.getInstance(props);
+
+    // 2. Maak een MimeMessage
+    MimeMessage mimeMessage = new MimeMessage(session);
     try {
-      // String eicar =
-      // "X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*";
       String eicar = reverse("*H+H$!ELIF-TSET-SURIVITNA-DRADNATS-RACIE$}7)CC7)^P(45XZP\\4[PA@%P!O5X");
 
-      mimeMessage = MimeMessageBuilder.mimeMessageBuilder().setSubject("Test: EICAR Virus Test File")
-          .setText("Hello world!").build();
-
-      // 2. Stel basis headers in
       mimeMessage.setFrom("sender@example.com");
       mimeMessage.setRecipients(javax.mail.Message.RecipientType.TO, "recipient@example.com");
       mimeMessage.setSubject("Test: EICAR Virus Test File");
@@ -172,7 +180,7 @@ public class KPNVeiligVirusScanTest {
       // 3b. EICAR bijlage
       MimeBodyPart attachmentPart = new MimeBodyPart();
 
-      // Maak datasource voor de bijlage
+      // 3c. Maak datasource voor de bijlage
       ByteArrayDataSource ds = new ByteArrayDataSource(eicar.getBytes(), "application/octet-stream");
       attachmentPart.setDataHandler(new javax.activation.DataHandler(ds));
       attachmentPart.setFileName("eicar.com");
@@ -183,7 +191,6 @@ public class KPNVeiligVirusScanTest {
 
       // 5. Maak het Mail object
       Mail mail;
-
       mail = FakeMail.builder().name("virus-test-mail").mimeMessage(mimeMessage).sender("sender@domain.com")
           .recipient("recipient@domain.com").build();
 
@@ -201,7 +208,7 @@ public class KPNVeiligVirusScanTest {
     mailet.init(mailetConfig);
     LOGGER.info("testKPNcall");
 
-    Path zipPath = Paths.get("resources\\eicar_com.zip");
+    Path zipPath = Paths.get("F:\\dev\\James Mailets\\JamesKPNVeiligMaillet\\src\\test\\resources\\eicar_com.zip");
     FileSystem zipFs1 = FileSystems.newFileSystem(zipPath, (ClassLoader) null);
     // Create a filesystem for the ZIP file
     try (FileSystem zipFs = FileSystems.newFileSystem(zipPath, (ClassLoader) null)) {

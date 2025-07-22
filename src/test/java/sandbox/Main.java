@@ -33,20 +33,16 @@ public class Main {
 
     try {
       mailetContext = mock(MailetContext.class);
-      mailetConfig = FakeMailetConfig.builder()
-          .mailetName("KPNVeiligScan")
-          .mailetContext(mailetContext)
+      mailetConfig = FakeMailetConfig.builder().mailetName("KPNVeiligScan").mailetContext(mailetContext)
           .setProperty("kpnVeiligPath", "C:\\Program Files (x86)\\KPN Veilig\\fsscan.exe")
-          .setProperty("tmpDir", "target\\tmp")
-          .setProperty("quarantineDir", "target/quarantine")
-          .build();
+          .setProperty("tmpDir", "target\\tmp").setProperty("quarantineDir", "target/quarantine").build();
 
       mailet = new KPNVeiligVirusScan();
       mailet.init(mailetConfig);
       KPNVeiligVirusScan spyMailet = spy(mailet);
 
-      boolean result = spyMailet.scanFileWithKPNVScan(destinationPath);
-      LOGGER.info("Scanresult: " + result);
+      // boolean result = spyMailet.scanFileWithKPNVScan(destinationPath);
+      // LOGGER.info("Scanresult: " + result);
     } catch (MessagingException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

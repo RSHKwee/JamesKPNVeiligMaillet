@@ -14,15 +14,22 @@ import java.nio.file.StandardCopyOption;
 import java.util.concurrent.TimeUnit;
 
 import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 
+import org.apache.mailet.Attribute;
+import org.apache.mailet.AttributeName;
+import org.apache.mailet.AttributeValue;
 import org.apache.mailet.Mail;
 import org.apache.mailet.MailetException;
 import org.apache.mailet.base.GenericMailet;
+import org.apache.mailet.base.RFC2822Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class KPNVeiligVirusScan extends GenericMailet {
   private static final Logger LOGGER = LoggerFactory.getLogger(KPNVeiligVirusScan.class);
+  protected static final AttributeName INFECTED_MAIL_ATTRIBUTE_NAME = AttributeName.of("org.apache.james.infected");
+  protected static final String INFECTED_HEADER_NAME = "X-MessageIsInfected";
 
   private Path tmpDir;
   private String kpnVeiligPath;
@@ -30,8 +37,6 @@ public class KPNVeiligVirusScan extends GenericMailet {
   private Path quarantineDir;
   private int scanTimeout;
 
-  /*
-   */
   /**
    * Initialize configuration parameters Additional info: "C:\Program Files
    * (x86)\KPN Veilig\fsscan.exe" "%FILE%" Returncode = 3 virus found
@@ -40,7 +45,15 @@ public class KPNVeiligVirusScan extends GenericMailet {
    */
   @Override
   public void init() throws MailetException {
-    tmpDir = Paths.get(getInitParameter("tmpDir", "C:\\James\\temp"));
+    String os = System.getProperty("os.name").toLowerCase();
+
+    if (!os.contains("win")) {
+      throw new MailetException("Only Windows supported.");
+    }
+
+    Path tempPath = Paths.get(System.getProperty("java.io.tmpdir"));
+
+    tmpDir = Paths.get(getInitParameter("tmpDir", tempPath.toAbsolutePath().toString()));
     kpnVeiligPath = getInitParameter("kpnVeiligPath", "C:\\Program Files (x86)\\KPN Veilig\\fsscan.exe");
     quarantineEnabled = Boolean.parseBoolean(getInitParameter("quarantine", "true"));
     quarantineDir = Paths.get(getInitParameter("quarantineDir", "C:\\James\\quarantine"));
@@ -76,8 +89,17 @@ public class KPNVeiligVirusScan extends GenericMailet {
       boolean infected = scanFileWithKPNVScan(tempFile);
 
       if (infected) {
-        LOGGER.debug("KPN Veilig output infected: " + tempFile.toString());
+        LOGGER.info("KPN Veilig output infected: " + tempFile.toString());
         handleInfected(mail, tempFile);
+
+        // mark the mail with a mail attribute to check later on by other
+        // matchers/mailets
+        mail.setAttribute(makeInfectedAttribute(true));
+        MimeMessage mimeMessage = mail.getMessage();
+
+        // mark the message with a header string
+        mimeMessage.setHeader(INFECTED_HEADER_NAME, "true");
+
       } else {
         LOGGER.debug("KPN Veilig output: " + tempFile.toString());
         if (!LOGGER.isDebugEnabled()) {
@@ -97,7 +119,7 @@ public class KPNVeiligVirusScan extends GenericMailet {
    * @throws IOException     IO Exception
    * @throws MailetException Mailet exception
    */
-  public boolean scanFileWithKPNVScan(Path file) throws IOException, MailetException {
+  boolean scanFileWithKPNVScan(Path file) throws IOException, MailetException {
     ProcessBuilder pb = new ProcessBuilder(kpnVeiligPath, file.toAbsolutePath().toString());
 
     pb.redirectErrorStream(true);
@@ -109,13 +131,13 @@ public class KPNVeiligVirusScan extends GenericMailet {
     try {
       Process process = pb.start();
       int procexit = process.waitFor();
-      LOGGER.debug("Procexit result: " + procexit);
 
       // Wait with timeout
       if (!process.waitFor(scanTimeout, TimeUnit.MILLISECONDS)) {
         process.destroyForcibly();
         throw new MailetException("KPN Veilig scan timeout exceeded");
       }
+      LOGGER.debug("Procexit result: " + procexit);
 
       // Parse exit code:
       // 0 = clean, 3 = infected, other codes = error
@@ -183,4 +205,20 @@ public class KPNVeiligVirusScan extends GenericMailet {
     return "KPN Veilig Antivirus Scanner Mailet (fsscan.exe)";
   }
 
+  private Attribute makeInfectedAttribute(boolean value) {
+    return new Attribute(INFECTED_MAIL_ATTRIBUTE_NAME, AttributeValue.of(value));
+  }
+
+  /**
+   * Saves changes resetting the original message id.
+   *
+   * @param message the message to save
+   */
+  protected final void saveChanges(MimeMessage message) throws MessagingException {
+    String messageId = message.getMessageID();
+    message.saveChanges();
+    if (messageId != null) {
+      message.setHeader(RFC2822Headers.MESSAGE_ID, messageId);
+    }
+  }
 }

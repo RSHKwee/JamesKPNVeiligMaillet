@@ -31,13 +31,13 @@
     </appender>
 
     <!-- Root Logger -->
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="ASYNC_FILE" />
     </root>
 
     <!-- Specific Logger with different level -->
-    <logger name="com.kwee.james.mailets" level="DEBUG" additivity="false">
+    <logger name="com.kwee.james.mailets" level="INFO" additivity="false">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="ASYNC_FILE" />
     </logger>
