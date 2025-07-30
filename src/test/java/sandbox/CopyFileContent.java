@@ -30,6 +30,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.apache.james.core.builder.MimeMessageBuilder;
+import org.apache.james.mailets.Kwee.KPNVeiligVirusScan;
 import org.apache.mailet.Mail;
 import org.apache.mailet.MailetContext;
 import org.apache.mailet.MailetException;
@@ -37,8 +38,6 @@ import org.apache.mailet.base.test.FakeMail;
 import org.apache.mailet.base.test.FakeMailetConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.kwee.james.mailets.KPNVeiligVirusScan;
 
 public class CopyFileContent {
   private static final Logger LOGGER = LoggerFactory.getLogger(CopyFileContent.class);

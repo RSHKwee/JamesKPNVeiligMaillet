@@ -1,4 +1,4 @@
-package com.kwee.james.mailets;
+package org.apache.james.mailets.Kwee;
 
 /**
  * Package KPN Virus scan on Windows.
@@ -119,7 +119,7 @@ public class KPNVeiligVirusScan extends GenericMailet {
    * @throws IOException     IO Exception
    * @throws MailetException Mailet exception
    */
-  boolean scanFileWithKPNVScan(Path file) throws IOException, MailetException {
+  public boolean scanFileWithKPNVScan(Path file) throws IOException, MailetException {
     ProcessBuilder pb = new ProcessBuilder(kpnVeiligPath, file.toAbsolutePath().toString());
 
     pb.redirectErrorStream(true);

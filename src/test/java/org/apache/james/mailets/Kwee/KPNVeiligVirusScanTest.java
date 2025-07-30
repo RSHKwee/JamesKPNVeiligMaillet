@@ -1,4 +1,4 @@
-package com.kwee.james.mailets;
+package org.apache.james.mailets.Kwee;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -8,8 +8,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 
 import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
@@ -201,32 +199,6 @@ public class KPNVeiligVirusScanTest {
       LOGGER.info(e.getMessage().toString());
     }
     return null;
-  }
-
-  @Test
-  public void testKPNcall() throws Exception {
-    mailet.init(mailetConfig);
-    LOGGER.info("testKPNcall");
-
-    Path zipPath = Paths.get("F:\\dev\\James Mailets\\JamesKPNVeiligMaillet\\src\\test\\resources\\eicar_com.zip");
-    FileSystem zipFs1 = FileSystems.newFileSystem(zipPath, (ClassLoader) null);
-    // Create a filesystem for the ZIP file
-    try (FileSystem zipFs = FileSystems.newFileSystem(zipPath, (ClassLoader) null)) {
-      // Get path to entry inside the ZIP
-      Path entryPath = zipFs.getPath("eicar.com");
-      // Path entryPath = zipFs.getPath("F:\\dev\\James
-      // Mailets\\KPNVeiligMailet\\target\\tmp\\eicar.com");
-
-      // File testfile = new File("target/tmp/ecar.eml");
-      // Path pad = testfile.toPath();
-      LOGGER.debug("File:  " + entryPath.toAbsolutePath().toString());
-
-      KPNVeiligVirusScan spyMailet = spy(mailet);
-
-      boolean result = spyMailet.scanFileWithKPNVScan(entryPath);
-      LOGGER.info("Result: " + result);
-    }
-
   }
 
   private String reverse(String str) {

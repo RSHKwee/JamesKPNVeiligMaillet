@@ -1,4 +1,4 @@
-<mailet match="All" class="com.kwee.james.mailets.KPNVeiligVirusScan">
+<mailet match="All" class="org.apache.james.mailets.Kwee.KPNVeiligVirusScan">
     <kpnVeiligPath>"C:\Program Files\F-Secure\Anti-Virus\fsscan.exe"</kpnVeiligPath>
     <tmpDir>C:\James\temp</tmpDir>
     <quarantine>true</quarantine>

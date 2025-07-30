@@ -1,187 +1,199 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <!-- Basis project informatie -->
-    <groupId>com.kwee.james</groupId>
-    <artifactId>kpn-veilig-james-mailet</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+  <!-- Basis project informatie -->
+  <groupId>com.kwee.james</groupId>
+  <artifactId>kpn-veilig-james-mailet</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
 
-    <name>Antivir KPN Veilig James Mailet</name>
-    <description>Custom KPN Veilig Antivirus Mailet for Apache James</description>
+  <name>Antivir KPN Veilig James Mailet</name>
+  <description>Custom KPN Veilig Antivirus Mailet for Apache James</description>
 
-    <properties>
-      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <java.version>11</java.version>
-      <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
-      <maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
-      <org.slf4j.version>2.0.4</org.slf4j.version>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.version>11</java.version>
+    <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
+    <maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
+    <org.slf4j.version>2.0.4</org.slf4j.version>
+    
+    <james.version>3.8.2</james.version> <!-- Controleer laatste versie op Maven Central -->        
+  </properties>
+
+  <!-- Dependencies -->
+  <dependencies>
+    <!-- Apache James Mailet API -->
+    <dependency>
+      <groupId>org.apache.james</groupId>
+      <artifactId>apache-mailet-api</artifactId>
+      <version>${james.version}</version>
+      <scope>provided</scope> <!-- James biedt dit al tijdens runtime -->
+    </dependency>
+
+    <!-- James core (optioneel, afhankelijk van functionaliteit) -->
+    <dependency>
+      <groupId>org.apache.james</groupId>
+      <artifactId>james-server-core</artifactId>
+      <version>${james.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.james</groupId>
+      <artifactId>apache-mailet-base</artifactId>
+      <scope>compile</scope>
+      <version>${james.version}</version>
+    </dependency>
+    
+    <!-- Logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${org.slf4j.version}</version>
+    </dependency>
       
-      <james.version>3.8.2</james.version> <!-- Controleer laatste versie op Maven Central -->        
-    </properties>
-
-    <!-- Dependencies -->
-    <dependencies>
-      <!-- Apache James Mailet API -->
-      <dependency>
-        <groupId>org.apache.james</groupId>
-        <artifactId>apache-mailet-api</artifactId>
-        <version>${james.version}</version>
-        <scope>provided</scope> <!-- James biedt dit al tijdens runtime -->
-      </dependency>
-
-      <!-- James core (optioneel, afhankelijk van functionaliteit) -->
-      <dependency>
-        <groupId>org.apache.james</groupId>
-        <artifactId>james-server-core</artifactId>
-        <version>${james.version}</version>
-        <scope>provided</scope>
-      </dependency>
-
-      <!-- Logging -->
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>${org.slf4j.version}</version>
-      </dependency>
-        
-      <!-- TestNG -->
-      <dependency>
-        <groupId>org.testng</groupId>
-        <artifactId>testng</artifactId>
-        <version>7.8.0</version>
-        <scope>test</scope>
-      </dependency>
-      
-      <!-- Mockito -->
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>5.6.0</version>
-        <scope>test</scope>
-      </dependency>
-      
-      <!-- Apache James test utilities -->
-      <dependency>
-        <groupId>org.apache.james</groupId>
-        <artifactId>james-server-util</artifactId>
-        <version>3.8.2</version>
-        <classifier>tests</classifier>
-        <scope>test</scope>
-      </dependency>
-      
-      <!-- Mime4J voor email parsing -->
-      <dependency>
-        <groupId>org.apache.james</groupId>
-        <artifactId>apache-mime4j-core</artifactId>
-        <version>0.8.10</version>
-        <scope>test</scope>
-      </dependency>
-      
-      <dependency>
-        <groupId>com.sun.mail</groupId>
-        <artifactId>jakarta.mail</artifactId>
-        <version>2.0.1</version> <!-- Gebruik de nieuwste versie -->
-      </dependency>
-      
-      <dependency>
-          <groupId>org.apache.james</groupId>
-          <artifactId>apache-mailet-base</artifactId>
-          <scope>compile</scope>
-          <version>${james.version}</version>
-      </dependency>
-      <dependency>
-          <groupId>org.apache.james</groupId>
-          <artifactId>james-server-testing</artifactId>
-          <scope>test</scope>
-          <version>${james.version}</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/org.apache.james/james-core -->
-      <dependency>
-         <groupId>org.apache.james</groupId>
-         <artifactId>james-core</artifactId>
-         <version>3.8.2</version>
-      </dependency>
- 
-     </dependencies>       
-     
-
-    <!-- Build configuratie -->
-    <build>
+    <!-- TestNG -->
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>7.8.0</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- Mockito -->
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>5.6.0</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- Apache James test utilities -->
+    <dependency>
+      <groupId>org.apache.james</groupId>
+      <artifactId>james-server-util</artifactId>
+      <version>3.8.2</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- Mime4J voor email parsing -->
+    <dependency>
+      <groupId>org.apache.james</groupId>
+      <artifactId>apache-mime4j-core</artifactId>
+      <version>0.8.10</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.sun.mail</groupId>
+      <artifactId>jakarta.mail</artifactId>
+      <version>2.0.1</version> <!-- Gebruik de nieuwste versie -->
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.james</groupId>
+      <artifactId>james-server-testing</artifactId>
+      <scope>test</scope>
+      <version>${james.version}</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.james/james-core -->
+    <dependency>
+      <groupId>org.apache.james</groupId>
+      <artifactId>james-core</artifactId>
+      <version>3.8.2</version>
+    </dependency>
+  </dependencies>       
+   
+  <!-- Build configuratie -->
+  <build>
     <!--
-         <resources>
-          <resource>
-            <directory>src/main/resources</directory>
-            <filtering>true</filtering>
-          </resource>
-        </resources>  
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>  
     -->
-        <plugins>
-            <!-- Java compiler plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin.version}</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
-            </plugin>
+    <plugins>
+      <!-- Java compiler plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven.compiler.plugin.version}</version>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+          <encoding>${project.build.sourceEncoding}</encoding>
+        </configuration>
+      </plugin>
 
-            <!-- JAR packaging plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>${maven.jar.plugin.version}</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-           <plugin>
-             <groupId>org.apache.maven.plugins</groupId>
-             <artifactId>maven-resources-plugin</artifactId>
-             <version>3.3.1</version> <!-- of nieuwere versie zoals 3.3.2 -->
-           </plugin>
-            <!-- Optioneel: Shade plugin voor uber-jar (alleen nodig als je afhankelijkheden inbouwt) -->
-            <!--
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
-        </plugins>
-    </build>
+      <!-- JAR packaging plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>${maven.jar.plugin.version}</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.3.1</version> <!-- of nieuwere versie zoals 3.3.2 -->
+        </plugin>
+        <!-- Optioneel: Shade plugin voor uber-jar (alleen nodig als je afhankelijkheden inbouwt) -->
+        <!--
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.5.0</version>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>shade</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+        -->
+    </plugins>
+  </build>
 
-    <!-- Repositories -->
-    <repositories>
-        <!-- Maven Central Repository -->
-        <repository>
-            <id>central</id>
-            <url>https://repo.maven.apache.org/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        
+  <!-- Repositories -->
+  <repositories>
+    <!-- Maven Central Repository -->
+    <repository>
+      <id>central</id>
+      <url>https://repo.maven.apache.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+      
+    <repository>
+      <id>apache.snapshots</id>
+      <name>Apache Snapshot Repository</name>
+      <url>https://repository.apache.org/snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+
+    <!-- Apache Snapshot Repository (optioneel voor snapshot versies) -->
+    <!--
     <repository>
         <id>apache.snapshots</id>
-        <name>Apache Snapshot Repository</name>
         <url>https://repository.apache.org/snapshots</url>
         <releases>
             <enabled>false</enabled>
@@ -190,19 +202,6 @@
             <enabled>true</enabled>
         </snapshots>
     </repository>
-
-        <!-- Apache Snapshot Repository (optioneel voor snapshot versies) -->
-        <!--
-        <repository>
-            <id>apache.snapshots</id>
-            <url>https://repository.apache.org/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        -->
-    </repositories>
+    -->
+  </repositories>
 </project>
