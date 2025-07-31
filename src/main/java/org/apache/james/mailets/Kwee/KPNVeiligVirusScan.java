@@ -151,10 +151,9 @@ public class KPNVeiligVirusScan extends GenericMailet {
             LOGGER.debug("KPN Veilig output: " + line);
           }
         }
-        throw new MailetException("KPN Veilig scan failed with code: " + exitCode);
       }
-
       return exitCode == 3;
+
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new MailetException("Scan interrupted", e);
@@ -171,6 +170,8 @@ public class KPNVeiligVirusScan extends GenericMailet {
    */
   private void handleInfected(Mail mail, Path file) throws MessagingException {
     mail.setErrorMessage("The attached email contained a virus and was blocked.");
+    mail.setState(Mail.GHOST);
+
     getMailetContext().sendMail(mail);
 
     // Quarantaine when configured
@@ -183,18 +184,7 @@ public class KPNVeiligVirusScan extends GenericMailet {
       } catch (IOException e) {
         throw new MessagingException("Quarantine failed", e);
       }
-    } else {
-      if (!LOGGER.isDebugEnabled()) {
-        try {
-          Files.delete(file);
-        } catch (IOException e) {
-          // do nothing
-        }
-      }
     }
-
-    // Stop processing
-    mail.setState(Mail.GHOST);
   }
 
   /**

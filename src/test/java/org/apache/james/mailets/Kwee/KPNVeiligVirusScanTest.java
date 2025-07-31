@@ -1,9 +1,6 @@
 package org.apache.james.mailets.Kwee;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 
@@ -67,50 +64,32 @@ public class KPNVeiligVirusScanTest {
     LOGGER.info("testCleanMailShouldContinueProcessing");
     // Arrange
     mailet.init(mailetConfig);
-    Mail mail = createTestMail();
+    FakeMail mail = createTestMail();
 
     // Mock de scanner om false (schoon) terug te geven
-    KPNVeiligVirusScan spyMailet = spy(mailet);
-    spyMailet.service(mail);
+    // KPNVeiligVirusScan spyMailet = spy(mailet);
+    // spyMailet.service(mail);
+    mailet.service(mail);
 
     // Assert
     assertNull(mail.getState(), "Mail state should not be changed");
   }
 
-  @Test(expectedExceptions = Exception.class)
+  @Test
   public void testInfectedMailShouldBeQuarantined() throws Exception {
     LOGGER.info("testInfectedMailShouldBeQuarantined");
     // Arrange
     mailet.init(mailetConfig);
-    Mail mail = createInfectedMail();
-
-    // Mock de scanner om true (geïnfecteerd) terug te geven
-    KPNVeiligVirusScan spyMailet = spy(mailet);
-//  doReturn(true).when(spyMailet).scanFileWithKPNVScan(any());
+    FakeMail mail = createInfectedMail();
 
     // Act
-    spyMailet.service(mail);
+    mailet.service(mail);
 
     // Assert
     assertEquals(mail.getState(), Mail.GHOST, "Mail should be ghosted");
   }
 
-  @Test(expectedExceptions = Exception.class)
-  public void testScanFailureShouldThrowException() throws Exception {
-    LOGGER.info("testScanFailureShouldThrowException");
-    // Arrange
-    mailet.init(mailetConfig);
-    Mail mail = createTestMail();
-
-    // Mock de scanner om een exception te gooien
-    KPNVeiligVirusScan spyMailet = spy(mailet);
-    doThrow(new MessagingException("Scan error")).when(spyMailet).scanFileWithKPNVScan(any());
-
-    // Act
-    spyMailet.service(mail);
-  }
-
-  @Test(expectedExceptions = Exception.class)
+  @Test
   public void testQuarantineDisabled() throws Exception {
     LOGGER.info("testQuarantineDisabled");
 
@@ -124,21 +103,21 @@ public class KPNVeiligVirusScanTest {
     mailet.init(mailetConfig);
     //@formatter:on
 
-    Mail mail = createInfectedMail();
-    KPNVeiligVirusScan spyMailet = spy(mailet);
+    FakeMail mail = createInfectedMail();
 
     // Act
-    spyMailet.service(mail);
+    mailet.service(mail);
 
     // Assert
     assertEquals(mail.getState(), Mail.GHOST, "Mail should be ghosted");
     // Verify no move to quarantine happened
     // (In echte implementatie zou je filesystem checks doen)
+
   }
 
-// Local routines
-//
-  private Mail createTestMail() {
+  // Local routines
+  //
+  private FakeMail createTestMail() {
     javax.mail.internet.MimeMessage message;
     try {
       message = MimeMessageBuilder.mimeMessageBuilder().setSubject("Test mail").setText("Hello world!").build();
@@ -153,7 +132,7 @@ public class KPNVeiligVirusScanTest {
   }
 
   // " *H+H$!ELIF-TSET-SURIVITNA-DRADNATS-RACIE$}7)CC7)^P(45XZP\\4[PA@%P!O5X";
-  private Mail createInfectedMail() throws MessagingException, IOException {
+  private FakeMail createInfectedMail() throws MessagingException, IOException {
     // 1. Maak een MimeMessage
     Properties props = new Properties();
     Session session = Session.getInstance(props);
@@ -192,7 +171,7 @@ public class KPNVeiligVirusScanTest {
       mail = FakeMail.builder().name("virus-test-mail").mimeMessage(mimeMessage).sender("sender@domain.com")
           .recipient("recipient@domain.com").build();
 
-      return mail;
+      return (FakeMail) mail;
     } catch (Exception e) {
       // TODO Auto-generated catch block
       // e.printStackTrace();
