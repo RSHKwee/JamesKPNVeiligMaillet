@@ -1,4 +1,4 @@
-package org.apache.james.mailets.Kwee;
+package org.apache.james.mailets.kwee;
 
 /**
  * Package KPN Virus scan on Windows.

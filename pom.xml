@@ -3,13 +3,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- Basis project informatie -->
-  <groupId>com.kwee.james</groupId>
+  <groupId>org.apache.james.mailets.kwee</groupId>
   <artifactId>kpn-veilig-james-mailet</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Antivir KPN Veilig James Mailet</name>
+  <name>Antivirus KPN Veilig James Mailet</name>
   <description>Custom KPN Veilig Antivirus Mailet for Apache James</description>
 
   <properties>
@@ -17,22 +16,21 @@
     <java.version>11</java.version>
     <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
     <maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
+    <maven.surefire.plugin.version>3.2.2</maven.surefire.plugin.version>
     <org.slf4j.version>2.0.4</org.slf4j.version>
-    
-    <james.version>3.8.2</james.version> <!-- Controleer laatste versie op Maven Central -->        
+    <james.version>3.8.2</james.version>
+    <testng.version>7.8.0</testng.version>
   </properties>
 
-  <!-- Dependencies -->
   <dependencies>
     <!-- Apache James Mailet API -->
     <dependency>
       <groupId>org.apache.james</groupId>
       <artifactId>apache-mailet-api</artifactId>
       <version>${james.version}</version>
-      <scope>provided</scope> <!-- James biedt dit al tijdens runtime -->
+      <scope>provided</scope>
     </dependency>
 
-    <!-- James core (optioneel, afhankelijk van functionaliteit) -->
     <dependency>
       <groupId>org.apache.james</groupId>
       <artifactId>james-server-core</artifactId>
@@ -43,8 +41,8 @@
     <dependency>
       <groupId>org.apache.james</groupId>
       <artifactId>apache-mailet-base</artifactId>
-      <scope>compile</scope>
       <version>${james.version}</version>
+      <scope>compile</scope>
     </dependency>
     
     <!-- Logging -->
@@ -54,12 +52,18 @@
       <version>${org.slf4j.version}</version>
     </dependency>
       
-    <!-- TestNG -->
+    <!-- TestNG with JUnit exclusion -->
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <version>7.8.0</version>
+      <version>${testng.version}</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Mockito -->
@@ -70,16 +74,21 @@
       <scope>test</scope>
     </dependency>
     
-    <!-- Apache James test utilities -->
+    <!-- Apache James test utilities with JUnit exclusions -->
     <dependency>
       <groupId>org.apache.james</groupId>
       <artifactId>james-server-util</artifactId>
-      <version>3.8.2</version>
+      <version>${james.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.junit.*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     
-    <!-- Mime4J voor email parsing -->
     <dependency>
       <groupId>org.apache.james</groupId>
       <artifactId>apache-mime4j-core</artifactId>
@@ -90,33 +99,38 @@
     <dependency>
       <groupId>com.sun.mail</groupId>
       <artifactId>jakarta.mail</artifactId>
-      <version>2.0.1</version> <!-- Gebruik de nieuwste versie -->
+      <version>2.0.1</version>
     </dependency>
     
     <dependency>
       <groupId>org.apache.james</groupId>
       <artifactId>james-server-testing</artifactId>
-      <scope>test</scope>
       <version>${james.version}</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.junit.vintage</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.apache.james/james-core -->
+    
     <dependency>
       <groupId>org.apache.james</groupId>
       <artifactId>james-core</artifactId>
-      <version>3.8.2</version>
+      <version>${james.version}</version>
     </dependency>
   </dependencies>       
    
-  <!-- Build configuratie -->
   <build>
-    <!--
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>  
-    -->
     <plugins>
       <!-- Java compiler plugin -->
       <plugin>
@@ -124,8 +138,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven.compiler.plugin.version}</version>
         <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
+          <release>${java.version}</release>
           <encoding>${project.build.sourceEncoding}</encoding>
         </configuration>
       </plugin>
@@ -143,54 +156,47 @@
           </archive>
         </configuration>
       </plugin>
-      <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>3.3.1</version> <!-- of nieuwere versie zoals 3.3.2 -->
-      </plugin>
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-  <artifactId>maven-surefire-plugin</artifactId>
-  <version>3.0.0-M7</version>
-  <configuration>
-    <skipTests>false</skipTests>
-  </configuration>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.3.1</version>
       </plugin>
+      
+      <!-- Configured Surefire Plugin for TestNG -->
       <plugin>
-  <groupId>org.apache.maven.plugins</groupId>
-  <artifactId>maven-surefire-plugin</artifactId>
-  <version>3.2.2</version>
-  <configuration>
-    <properties>
-      <property>
-        <name>usedefaultlisteners</name>
-        <value>false</value> <!-- Disable JUnit listeners -->
-      </property>
-    </properties>
-  </configuration>
-</plugin>
-        <!-- Optioneel: Shade plugin voor uber-jar (alleen nodig als je afhankelijkheden inbouwt) -->
-        <!--
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-shade-plugin</artifactId>
-            <version>3.5.0</version>
-            <executions>
-                <execution>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>shade</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
-        -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${maven.surefire.plugin.version}</version>
+        <configuration>
+          <skipTests>false</skipTests>
+          <properties>
+            <property>
+              <name>usedefaultlisteners</name>
+              <value>false</value>
+            </property>
+          </properties>
+          <suiteXmlFiles>
+            <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+          </suiteXmlFiles>
+          <dependenciesToIgnore>
+            <dependency>junit:junit</dependency>
+            <dependency>org.junit.jupiter:*</dependency>
+            <dependency>org.junit.vintage:*</dependency>
+          </dependenciesToIgnore>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>surefire-testng</artifactId>
+            <version>${maven.surefire.plugin.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
     </plugins>
   </build>
 
-  <!-- Repositories -->
   <repositories>
-    <!-- Maven Central Repository -->
     <repository>
       <id>central</id>
       <url>https://repo.maven.apache.org/maven2</url>
@@ -210,19 +216,5 @@
         <enabled>true</enabled>
       </snapshots>
     </repository>
-
-    <!-- Apache Snapshot Repository (optioneel voor snapshot versies) -->
-    <!--
-    <repository>
-        <id>apache.snapshots</id>
-        <url>https://repository.apache.org/snapshots</url>
-        <releases>
-            <enabled>false</enabled>
-        </releases>
-        <snapshots>
-            <enabled>true</enabled>
-        </snapshots>
-    </repository>
-    -->
   </repositories>
 </project>

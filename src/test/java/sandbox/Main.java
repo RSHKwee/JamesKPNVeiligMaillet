@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 
 import javax.mail.MessagingException;
 
-import org.apache.james.mailets.Kwee.KPNVeiligVirusScan;
+import org.apache.james.mailets.kwee.KPNVeiligVirusScan;
 import org.apache.mailet.MailetContext;
 import org.apache.mailet.base.test.FakeMailetConfig;
 import org.slf4j.Logger;

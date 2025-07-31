@@ -37,7 +37,7 @@
     </root>
 
     <!-- Specific Logger with different level -->
-    <logger name="org.apache.james.mailets.Kwee" level="INFO" additivity="false">
+    <logger name="org.apache.james.mailets.kwee" level="ERROR" additivity="false">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="ASYNC_FILE" />
     </logger>

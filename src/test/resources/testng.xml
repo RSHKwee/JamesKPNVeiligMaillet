@@ -1,0 +1,33 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="KPN Veilig Mailet Test Suite" verbose="1" thread-count="1">
+
+  <test name="Unit Tests" preserve-order="true">
+    <packages>
+      <!-- This will run all tests in your test package hierarchy -->
+      <package name="org.apache.james.mailets.kwee.*"/>
+    </packages>
+    
+    <!-- Alternatively, you can specify individual classes:
+    <classes>
+      <class name="com.kwee.james.YourTestClass"/>
+    </classes>
+    -->
+  </test>
+
+  <!-- Example of another test group (you can add more as needed) -->
+  <test name="Integration Tests">
+    <groups>
+      <run>
+        <include name="integration"/>
+      </run>
+    </groups>
+    <packages>
+      <package name="org.apache.james.mailets.kwee.*"/>
+    </packages>
+  </test>
+
+  <listeners>
+    <!-- Optional TestNG listeners -->
+    <listener class-name="org.testng.reporters.EmailableReporter"/>
+  </listeners>
+</suite>

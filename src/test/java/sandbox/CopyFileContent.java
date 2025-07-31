@@ -30,7 +30,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.apache.james.core.builder.MimeMessageBuilder;
-import org.apache.james.mailets.Kwee.KPNVeiligVirusScan;
+import org.apache.james.mailets.kwee.KPNVeiligVirusScan;
 import org.apache.mailet.Mail;
 import org.apache.mailet.MailetContext;
 import org.apache.mailet.MailetException;
