@@ -118,11 +118,22 @@ public class KPNVeiligVirusScanTest {
   // Local routines
   //
   private FakeMail createTestMail() {
-    javax.mail.internet.MimeMessage message;
+    MimeMessage message;
     try {
-      message = MimeMessageBuilder.mimeMessageBuilder().setSubject("Test mail").setText("Hello world!").build();
-      return FakeMail.builder().name("mail1").mimeMessage(message).sender("sender@domain.com")
-          .recipient("recipient@domain.com").build();
+      //@formatter:off
+      message = MimeMessageBuilder
+          .mimeMessageBuilder()
+          .setSubject("Test mail")
+          .setText("Hello world!")
+          .build();
+      return FakeMail
+          .builder()
+          .name("mail1")
+          .mimeMessage(message)
+          .sender("sender@domain.com")
+          .recipient("recipient@domain.com")
+          .build();
+      //@formatter:on
     } catch (Exception e) {
       // TODO Auto-generated catch block
       LOGGER.info(e.getMessage().toString());
