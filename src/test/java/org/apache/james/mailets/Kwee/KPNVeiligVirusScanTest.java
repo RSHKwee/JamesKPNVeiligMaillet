@@ -1,4 +1,4 @@
-package org.apache.james.mailets.kwee;
+package org.apache.james.mailets.Kwee;
 
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;

@@ -4,7 +4,7 @@
   <test name="Unit Tests" preserve-order="true">
     <packages>
       <!-- This will run all tests in your test package hierarchy -->
-      <package name="org.apache.james.mailets.kwee.*"/>
+      <package name="org.apache.james.mailets.Kwee.*"/>
     </packages>
     
     <!-- Alternatively, you can specify individual classes:
@@ -22,7 +22,7 @@
       </run>
     </groups>
     <packages>
-      <package name="org.apache.james.mailets.kwee.*"/>
+      <package name="org.apache.james.mailets.Kwee.*"/>
     </packages>
   </test>
 
