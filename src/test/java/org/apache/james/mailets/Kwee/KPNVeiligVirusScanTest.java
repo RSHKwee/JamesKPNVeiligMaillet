@@ -1,4 +1,4 @@
-package org.apache.james.mailets.kwee;
+package org.apache.james.mailets.Kwee;
 
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
@@ -62,13 +62,9 @@ public class KPNVeiligVirusScanTest {
   @Test
   public void testCleanMailShouldContinueProcessing() throws Exception {
     LOGGER.info("testCleanMailShouldContinueProcessing");
-    // Arrange
+    // Arrange & Act
     mailet.init(mailetConfig);
     FakeMail mail = createTestMail();
-
-    // Mock de scanner om false (schoon) terug te geven
-    // KPNVeiligVirusScan spyMailet = spy(mailet);
-    // spyMailet.service(mail);
     mailet.service(mail);
 
     // Assert
@@ -78,21 +74,23 @@ public class KPNVeiligVirusScanTest {
   @Test
   public void testInfectedMailShouldBeQuarantined() throws Exception {
     LOGGER.info("testInfectedMailShouldBeQuarantined");
-    // Arrange
+    // Arrange & Act
     mailet.init(mailetConfig);
     FakeMail mail = createInfectedMail();
-
-    // Act
     mailet.service(mail);
 
     // Assert
     assertEquals(mail.getState(), Mail.GHOST, "Mail should be ghosted");
   }
 
+  /**
+   * 
+   * @throws Exception
+   */
   @Test
   public void testQuarantineDisabled() throws Exception {
     LOGGER.info("testQuarantineDisabled");
-
+    // Arrange
     //@formatter:off
     mailetConfig = FakeMailetConfig.builder()
         .mailetName("KPNVeiligVirusScan")
@@ -104,7 +102,6 @@ public class KPNVeiligVirusScanTest {
     //@formatter:on
 
     FakeMail mail = createInfectedMail();
-
     // Act
     mailet.service(mail);
 
@@ -115,8 +112,13 @@ public class KPNVeiligVirusScanTest {
 
   }
 
+  // =========================================================
   // Local routines
-  //
+  /**
+   * Create a Mail
+   * 
+   * @return Composed mail
+   */
   private FakeMail createTestMail() {
     MimeMessage message;
     try {
@@ -135,20 +137,27 @@ public class KPNVeiligVirusScanTest {
           .build();
       //@formatter:on
     } catch (Exception e) {
-      // TODO Auto-generated catch block
       LOGGER.info(e.getMessage().toString());
-      // e.printStackTrace();
     }
     return null;
   }
 
-  // " *H+H$!ELIF-TSET-SURIVITNA-DRADNATS-RACIE$}7)CC7)^P(45XZP\\4[PA@%P!O5X";
+  /**
+   * Create a mail with a Virus
+   * 
+   * Eicar string in reverse:
+   * "*H+H$!ELIF-TSET-SURIVITNA-DRADNATS-RACIE$}7)CC7)^P(45XZP\\4[PA@%P!O5X"
+   * 
+   * @return Compose mail
+   * @throws MessagingException
+   * @throws IOException
+   */
   private FakeMail createInfectedMail() throws MessagingException, IOException {
-    // 1. Maak een MimeMessage
+    // 1. Initial
     Properties props = new Properties();
     Session session = Session.getInstance(props);
 
-    // 2. Maak een MimeMessage
+    // 2. Create a MimeMessage
     MimeMessage mimeMessage = new MimeMessage(session);
     try {
       String eicar = reverse("*H+H$!ELIF-TSET-SURIVITNA-DRADNATS-RACIE$}7)CC7)^P(45XZP\\4[PA@%P!O5X");
@@ -157,40 +166,44 @@ public class KPNVeiligVirusScanTest {
       mimeMessage.setRecipients(javax.mail.Message.RecipientType.TO, "recipient@example.com");
       mimeMessage.setSubject("Test: EICAR Virus Test File");
 
-      // 3. Maak multipart bericht met tekst en bijlage
+      // 3. Create multipart message with text and attachment
       MimeMultipart multipart = new MimeMultipart();
 
-      // 3a. Tekstgedeelte
+      // 3a. Text part
       MimeBodyPart textPart = new MimeBodyPart();
       textPart.setText("Dit is een testmail met een veilig testvirus als bijlage.");
       multipart.addBodyPart(textPart);
 
-      // 3b. EICAR bijlage
+      // 3b. EICAR attahment
       MimeBodyPart attachmentPart = new MimeBodyPart();
 
-      // 3c. Maak datasource voor de bijlage
+      // 3c. Datasource as attachment
       ByteArrayDataSource ds = new ByteArrayDataSource(eicar.getBytes(), "application/octet-stream");
       attachmentPart.setDataHandler(new javax.activation.DataHandler(ds));
       attachmentPart.setFileName("eicar.com");
       multipart.addBodyPart(attachmentPart);
 
-      // 4. Zet de content in het bericht
+      // 4. Fill content message
       mimeMessage.setContent(multipart);
 
-      // 5. Maak het Mail object
+      // 5. Make Mail object
       Mail mail;
       mail = FakeMail.builder().name("virus-test-mail").mimeMessage(mimeMessage).sender("sender@domain.com")
           .recipient("recipient@domain.com").build();
 
       return (FakeMail) mail;
     } catch (Exception e) {
-      // TODO Auto-generated catch block
-      // e.printStackTrace();
       LOGGER.info(e.getMessage().toString());
     }
     return null;
   }
 
+  /**
+   * Reverse String
+   * 
+   * @param str String to reverse
+   * @return Reversed String
+   */
   private String reverse(String str) {
     if (str.isEmpty()) {
       return str;

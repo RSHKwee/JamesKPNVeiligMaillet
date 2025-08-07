@@ -1,4 +1,4 @@
-package org.apache.james.mailets.kwee;
+package org.apache.james.mailets.Kwee;
 
 /**
  * Package KPN Virus scan on Windows.
@@ -38,8 +38,10 @@ public class KPNVeiligVirusScan extends GenericMailet {
   private int scanTimeout;
 
   /**
-   * Initialize configuration parameters Additional info: "C:\Program Files
-   * (x86)\KPN Veilig\fsscan.exe" "%FILE%" Returncode = 3 virus found
+   * Initialize configuration parameters
+   * 
+   * Additional info: "C:\Program Files (x86)\KPN Veilig\fsscan.exe" "%FILE%"
+   * Returncode = 3 virus found
    * 
    * @throws MailetException
    */
@@ -50,7 +52,6 @@ public class KPNVeiligVirusScan extends GenericMailet {
     if (!os.contains("win")) {
       throw new MailetException("Only Windows supported.");
     }
-
     Path tempPath = Paths.get(System.getProperty("java.io.tmpdir"));
 
     tmpDir = Paths.get(getInitParameter("tmpDir", tempPath.toAbsolutePath().toString()));
@@ -58,6 +59,8 @@ public class KPNVeiligVirusScan extends GenericMailet {
     quarantineEnabled = Boolean.parseBoolean(getInitParameter("quarantine", "true"));
     quarantineDir = Paths.get(getInitParameter("quarantineDir", "C:\\James\\quarantine"));
     scanTimeout = Integer.parseInt(getInitParameter("scanTimeout", "30000"));
+
+    LOGGER.debug("KPN Veilig service started.");
 
     try {
       Files.createDirectories(tmpDir);
@@ -78,8 +81,8 @@ public class KPNVeiligVirusScan extends GenericMailet {
   @Override
   public void service(Mail mail) throws MessagingException {
     try {
-      LOGGER.info("KPN Veilig service");
-      // Sla mail tijdelijk op
+      LOGGER.debug("KPN Veilig service");
+      // Store mail temporarily on disk
       Path tempFile = Files.createTempFile(tmpDir, "scan-", ".eml");
       try (OutputStream out = Files.newOutputStream(tempFile)) {
         mail.getMessage().writeTo(out);
@@ -100,11 +103,15 @@ public class KPNVeiligVirusScan extends GenericMailet {
         // mark the message with a header string
         mimeMessage.setHeader(INFECTED_HEADER_NAME, "true");
 
-      } else {
-        LOGGER.debug("KPN Veilig output: " + tempFile.toString());
         if (!LOGGER.isDebugEnabled()) {
-          Files.delete(tempFile);
+          try {
+            Files.delete(tempFile);
+          } catch (Exception e) {
+            // nothing
+          }
         }
+      } else {
+        Files.delete(tempFile);
       }
     } catch (IOException e) {
       throw new MessagingException("Scan failed", e);
