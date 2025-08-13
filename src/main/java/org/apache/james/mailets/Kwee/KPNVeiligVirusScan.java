@@ -10,11 +10,12 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.concurrent.TimeUnit;
 
 import javax.mail.MessagingException;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import org.apache.mailet.Attribute;
 import org.apache.mailet.AttributeName;
@@ -33,8 +34,8 @@ public class KPNVeiligVirusScan extends GenericMailet {
 
   private Path tmpDir;
   private String kpnVeiligPath;
-  private boolean quarantineEnabled;
-  private Path quarantineDir;
+  // private boolean quarantineEnabled;
+  // private Path quarantineDir;
   private int scanTimeout;
 
   /**
@@ -56,20 +57,18 @@ public class KPNVeiligVirusScan extends GenericMailet {
 
     tmpDir = Paths.get(getInitParameter("tmpDir", tempPath.toAbsolutePath().toString()));
     kpnVeiligPath = getInitParameter("kpnVeiligPath", "C:\\Program Files (x86)\\KPN Veilig\\fsscan.exe");
-    quarantineEnabled = Boolean.parseBoolean(getInitParameter("quarantine", "true"));
-    quarantineDir = Paths.get(getInitParameter("quarantineDir", "C:\\James\\quarantine"));
+    // quarantineEnabled = Boolean.parseBoolean(getInitParameter("quarantine",
+    // "true"));
+    // quarantineDir = Paths.get(getInitParameter("quarantineDir",
+    // "C:\\James\\quarantine"));
     scanTimeout = Integer.parseInt(getInitParameter("scanTimeout", "30000"));
 
     LOGGER.debug("KPN Veilig service started.");
-
-    try {
-      Files.createDirectories(tmpDir);
-      if (quarantineEnabled) {
-        Files.createDirectories(quarantineDir);
-      }
-    } catch (IOException e) {
-      throw new MailetException("Could not create directories", e);
-    }
+    /*
+     * try { Files.createDirectories(tmpDir); if (quarantineEnabled) {
+     * Files.createDirectories(quarantineDir); } } catch (IOException e) { throw new
+     * MailetException("Could not create directories", e); }
+     */
   }
 
   /**
@@ -90,7 +89,6 @@ public class KPNVeiligVirusScan extends GenericMailet {
 
       // Perform scan
       boolean infected = scanFileWithKPNVScan(tempFile);
-
       if (infected) {
         LOGGER.info("KPN Veilig output infected: " + tempFile.toString());
         handleInfected(mail, tempFile);
@@ -102,6 +100,7 @@ public class KPNVeiligVirusScan extends GenericMailet {
 
         // mark the message with a header string
         mimeMessage.setHeader(INFECTED_HEADER_NAME, "true");
+        mimeMessage.saveChanges();
 
         if (!LOGGER.isDebugEnabled()) {
           try {
@@ -177,21 +176,25 @@ public class KPNVeiligVirusScan extends GenericMailet {
    */
   private void handleInfected(Mail mail, Path file) throws MessagingException {
     mail.setErrorMessage("The attached email contained a virus and was blocked.");
-    mail.setState(Mail.GHOST);
+    // mail.setState(Mail.GHOST);
+    try {
+      removeAttachments(mail);
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      // e.printStackTrace();
+    }
 
     getMailetContext().sendMail(mail);
 
     // Quarantaine when configured
-    if (quarantineEnabled) {
-      try {
-        String quarantineFileName = "infected-" + System.currentTimeMillis() + ".eml";
-        Path target = quarantineDir.resolve(quarantineFileName);
-        Files.move(file, target, StandardCopyOption.REPLACE_EXISTING);
-        LOGGER.warn("Quarantined infected email to: " + target);
-      } catch (IOException e) {
-        throw new MessagingException("Quarantine failed", e);
-      }
-    }
+    /*
+     * if (quarantineEnabled) { try { String quarantineFileName = "infected-" +
+     * System.currentTimeMillis() + ".eml"; Path target =
+     * quarantineDir.resolve(quarantineFileName); Files.move(file, target,
+     * StandardCopyOption.REPLACE_EXISTING);
+     * LOGGER.warn("Quarantined infected email to: " + target); } catch (IOException
+     * e) { throw new MessagingException("Quarantine failed", e); } }
+     */
   }
 
   /**
@@ -204,6 +207,27 @@ public class KPNVeiligVirusScan extends GenericMailet {
 
   private Attribute makeInfectedAttribute(boolean value) {
     return new Attribute(INFECTED_MAIL_ATTRIBUTE_NAME, AttributeValue.of(value));
+  }
+
+  private void removeAttachments(Mail mail) throws MessagingException, IOException {
+    MimeMessage mimeMessage = mail.getMessage();
+
+    if (mimeMessage.isMimeType("multipart/*")) {
+      MimeMultipart multipart = (MimeMultipart) mimeMessage.getContent();
+      MimeMultipart newMultipart = new MimeMultipart();
+
+      for (int i = 0; i < multipart.getCount(); i++) {
+        MimeBodyPart part = (MimeBodyPart) multipart.getBodyPart(i);
+
+        // Behoud alleen niet-attachment delen
+        if (part.getDisposition() == null || !part.getDisposition().equalsIgnoreCase(MimeBodyPart.ATTACHMENT)) {
+          newMultipart.addBodyPart((MimeBodyPart) part);
+        }
+      }
+
+      mimeMessage.setContent(newMultipart);
+      mimeMessage.saveChanges();
+    }
   }
 
   /**

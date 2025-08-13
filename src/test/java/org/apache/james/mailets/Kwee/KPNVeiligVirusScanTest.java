@@ -5,6 +5,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
@@ -46,7 +47,6 @@ public class KPNVeiligVirusScanTest {
         .mailetContext(mailetContext)
         .setProperty("kpnVeiligPath", "C:\\Program Files (x86)\\KPN Veilig\\fsscan.exe")
         .setProperty("tmpDir", tempPath.toAbsolutePath().toString())
-        .setProperty("quarantineDir", "target/quarantine")
         .build();
     //@formatter:on
   }
@@ -55,8 +55,6 @@ public class KPNVeiligVirusScanTest {
   public void testInitShouldCreateDirectories() throws Exception {
     LOGGER.info("testInitShouldCreateDirectories");
     mailet.init(mailetConfig);
-    // Hier zou je kunnen verifiëren of directories zijn aangemaakt
-    // (In echte implementatie zou je Files.exists checken)
   }
 
   @Test
@@ -80,7 +78,8 @@ public class KPNVeiligVirusScanTest {
     mailet.service(mail);
 
     // Assert
-    assertEquals(mail.getState(), Mail.GHOST, "Mail should be ghosted");
+    Serializable bInfected = mail.getAttribute("org.apache.james.infected");
+    assertEquals(bInfected, true, "Mail attribute infected should be true");
   }
 
   /**
@@ -106,10 +105,8 @@ public class KPNVeiligVirusScanTest {
     mailet.service(mail);
 
     // Assert
-    assertEquals(mail.getState(), Mail.GHOST, "Mail should be ghosted");
-    // Verify no move to quarantine happened
-    // (In echte implementatie zou je filesystem checks doen)
-
+    Serializable bInfected = mail.getAttribute("org.apache.james.infected");
+    assertEquals(bInfected, true, "Mail attribute infected should be true");
   }
 
   // =========================================================
