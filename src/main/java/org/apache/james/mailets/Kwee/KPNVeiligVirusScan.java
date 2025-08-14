@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 import javax.mail.MessagingException;
+import javax.mail.Part;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
@@ -29,13 +30,15 @@ import org.slf4j.LoggerFactory;
 
 public class KPNVeiligVirusScan extends GenericMailet {
   private static final Logger LOGGER = LoggerFactory.getLogger(KPNVeiligVirusScan.class);
+  private static final String INFONAME = "KPN Veilig";
+
   protected static final AttributeName INFECTED_MAIL_ATTRIBUTE_NAME = AttributeName.of("org.apache.james.infected");
   protected static final String INFECTED_HEADER_NAME = "X-MessageIsInfected";
+  protected static final String INFECTED_HEADER_NAME_STATUS = "X-Virus-Status";
+  protected static final String INFECTED_HEADER_NAME_SCANNED = "X-Virus-Scanned";
 
   private Path tmpDir;
   private String kpnVeiligPath;
-  // private boolean quarantineEnabled;
-  // private Path quarantineDir;
   private int scanTimeout;
 
   /**
@@ -57,18 +60,9 @@ public class KPNVeiligVirusScan extends GenericMailet {
 
     tmpDir = Paths.get(getInitParameter("tmpDir", tempPath.toAbsolutePath().toString()));
     kpnVeiligPath = getInitParameter("kpnVeiligPath", "C:\\Program Files (x86)\\KPN Veilig\\fsscan.exe");
-    // quarantineEnabled = Boolean.parseBoolean(getInitParameter("quarantine",
-    // "true"));
-    // quarantineDir = Paths.get(getInitParameter("quarantineDir",
-    // "C:\\James\\quarantine"));
     scanTimeout = Integer.parseInt(getInitParameter("scanTimeout", "30000"));
 
     LOGGER.debug("KPN Veilig service started.");
-    /*
-     * try { Files.createDirectories(tmpDir); if (quarantineEnabled) {
-     * Files.createDirectories(quarantineDir); } } catch (IOException e) { throw new
-     * MailetException("Could not create directories", e); }
-     */
   }
 
   /**
@@ -91,22 +85,13 @@ public class KPNVeiligVirusScan extends GenericMailet {
       boolean infected = scanFileWithKPNVScan(tempFile);
       if (infected) {
         LOGGER.info("KPN Veilig output infected: " + tempFile.toString());
-        handleInfected(mail, tempFile);
-
-        // mark the mail with a mail attribute to check later on by other
-        // matchers/mailets
-        mail.setAttribute(makeInfectedAttribute(true));
-        MimeMessage mimeMessage = mail.getMessage();
-
-        // mark the message with a header string
-        mimeMessage.setHeader(INFECTED_HEADER_NAME, "true");
-        mimeMessage.saveChanges();
+        handleInfected(mail);
 
         if (!LOGGER.isDebugEnabled()) {
           try {
             Files.delete(tempFile);
           } catch (Exception e) {
-            // nothing
+            // Do nothing
           }
         }
       } else {
@@ -141,7 +126,7 @@ public class KPNVeiligVirusScan extends GenericMailet {
       // Wait with timeout
       if (!process.waitFor(scanTimeout, TimeUnit.MILLISECONDS)) {
         process.destroyForcibly();
-        throw new MailetException("KPN Veilig scan timeout exceeded");
+        throw new MailetException(INFONAME + " scan timeout exceeded");
       }
       LOGGER.debug("Procexit result: " + procexit);
 
@@ -154,7 +139,7 @@ public class KPNVeiligVirusScan extends GenericMailet {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
           String line;
           while ((line = reader.readLine()) != null) {
-            LOGGER.debug("KPN Veilig output: " + line);
+            LOGGER.debug(INFONAME + " output: " + line);
           }
         }
       }
@@ -167,66 +152,126 @@ public class KPNVeiligVirusScan extends GenericMailet {
   }
 
   /**
+   * Give mailet information.
+   */
+  @Override
+  public String getMailetInfo() {
+    return INFONAME + " Antivirus Scanner Mailet (fsscan.exe)";
+  }
+
+  // v ========== Private functions ================
+  /**
    * Handle a mail with a virus. By sending a notification, create a new mai with
    * use of the mailet context.
    *
    * @param mail Mail with virus
-   * @param file Temporary copy of mail on disk.
    * @throws MessagingException Message exception
    */
-  private void handleInfected(Mail mail, Path file) throws MessagingException {
+  private void handleInfected(Mail mail) throws MessagingException {
     mail.setErrorMessage("The attached email contained a virus and was blocked.");
     // mail.setState(Mail.GHOST);
     try {
       removeAttachments(mail);
     } catch (IOException e) {
-      // TODO Auto-generated catch block
-      // e.printStackTrace();
+      LOGGER.info("handleInfected mail goes wrong: " + e.getMessage());
     }
 
+    // mark the mail with a mail attribute to check later on by other
+    // matchers/mailets
+    mail.setAttribute(makeInfectedAttribute(true));
+    MimeMessage mimeMessage = mail.getMessage();
+
+    // mark the message with a header string
+    mimeMessage.setHeader(INFECTED_HEADER_NAME, "true");
+    mimeMessage.addHeader(INFECTED_HEADER_NAME_STATUS, "Infected");
+    mimeMessage.addHeader(INFECTED_HEADER_NAME_SCANNED, INFONAME);
+
+    mimeMessage.saveChanges();
+
     getMailetContext().sendMail(mail);
-
-    // Quarantaine when configured
-    /*
-     * if (quarantineEnabled) { try { String quarantineFileName = "infected-" +
-     * System.currentTimeMillis() + ".eml"; Path target =
-     * quarantineDir.resolve(quarantineFileName); Files.move(file, target,
-     * StandardCopyOption.REPLACE_EXISTING);
-     * LOGGER.warn("Quarantined infected email to: " + target); } catch (IOException
-     * e) { throw new MessagingException("Quarantine failed", e); } }
-     */
-  }
-
-  /**
-   * Give mailet information.
-   */
-  @Override
-  public String getMailetInfo() {
-    return "KPN Veilig Antivirus Scanner Mailet (fsscan.exe)";
   }
 
   private Attribute makeInfectedAttribute(boolean value) {
     return new Attribute(INFECTED_MAIL_ATTRIBUTE_NAME, AttributeValue.of(value));
   }
 
+  /**
+   * Remove (infected) attachments
+   * 
+   * @param mail
+   * @throws MessagingException
+   * @throws IOException
+   */
   private void removeAttachments(Mail mail) throws MessagingException, IOException {
     MimeMessage mimeMessage = mail.getMessage();
+    int removedCount = 0;
+    StringBuilder removedFiles = new StringBuilder();
 
     if (mimeMessage.isMimeType("multipart/*")) {
-      MimeMultipart multipart = (MimeMultipart) mimeMessage.getContent();
+      MimeMultipart originalMultipart = (MimeMultipart) mimeMessage.getContent();
       MimeMultipart newMultipart = new MimeMultipart();
 
-      for (int i = 0; i < multipart.getCount(); i++) {
-        MimeBodyPart part = (MimeBodyPart) multipart.getBodyPart(i);
+      for (int i = 0; i < originalMultipart.getCount(); i++) {
+        MimeBodyPart part = (MimeBodyPart) originalMultipart.getBodyPart(i);
 
-        // Behoud alleen niet-attachment delen
-        if (part.getDisposition() == null || !part.getDisposition().equalsIgnoreCase(MimeBodyPart.ATTACHMENT)) {
-          newMultipart.addBodyPart((MimeBodyPart) part);
+        if (part.getDisposition() != null && part.getDisposition().equalsIgnoreCase(Part.ATTACHMENT)) {
+          removedCount++;
+          removedFiles.append("\n- ").append(part.getFileName());
+        } else {
+          newMultipart.addBodyPart(part);
         }
+      }
+
+      if (removedCount > 0) {
+        addRemovalNotice(newMultipart, removedCount, removedFiles.toString());
       }
 
       mimeMessage.setContent(newMultipart);
       mimeMessage.saveChanges();
+    }
+  }
+
+  /**
+   * Strip mail from attachment(s) and make announcement...
+   * 
+   * @param multipart
+   * @param removedCount
+   * @param fileNames
+   * @throws MessagingException
+   */
+  private void addRemovalNotice(MimeMultipart multipart, int removedCount, String fileNames) throws MessagingException {
+    // Create new body part with a remark
+    MimeBodyPart noticePart = new MimeBodyPart();
+
+    String noticeText = String.format(
+        "\n\n---\n" + "Opmerking: %d bijlage(n) is/zijn verwijderd uit dit bericht:%s\n" + "---\n", removedCount,
+        fileNames);
+
+    // Add remark to existing text
+    try {
+      // Haal de bestaande tekst/html body part op
+      for (int i = 0; i < multipart.getCount(); i++) {
+        MimeBodyPart part = (MimeBodyPart) multipart.getBodyPart(i);
+        if (part.isMimeType("text/plain")) {
+          String currentContent = (String) part.getContent();
+          part.setText(currentContent + noticeText);
+          return;
+        } else if (part.isMimeType("text/html")) {
+          String currentContent = (String) part.getContent();
+          String htmlNotice = String.format(
+              "<hr><p><em>Opmerking: %d bijlage(n) is/zijn verwijderd uit dit bericht:%s</em></p>", removedCount,
+              fileNames.replace("\n", "<br>"));
+          part.setContent(currentContent + htmlNotice, "text/html");
+          return;
+        }
+      }
+
+      // If no text part found, then create a new one.
+      noticePart.setText(noticeText);
+      multipart.addBodyPart(noticePart);
+
+    } catch (IOException e) {
+      throw new MessagingException("Kon content niet lezen", e);
     }
   }
 
