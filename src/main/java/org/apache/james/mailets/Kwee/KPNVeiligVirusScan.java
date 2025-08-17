@@ -28,14 +28,28 @@ import org.apache.mailet.base.RFC2822Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+//@formatter:off
+/**
+ * Mail header when infected the following attributes are set:
+ * 
+ * - X-MessageIsInfected = true 
+ * - X-Virus-Status = "Infected" 
+ * - X-Virus-Scanned = "KPN Veilig" 
+ * - mail.setState("Virus"); // Route to virus processor
+ *
+ */
+//formatter:on
 public class KPNVeiligVirusScan extends GenericMailet {
   private static final Logger LOGGER = LoggerFactory.getLogger(KPNVeiligVirusScan.class);
   private static final String INFONAME = "KPN Veilig";
 
   protected static final AttributeName INFECTED_MAIL_ATTRIBUTE_NAME = AttributeName.of("org.apache.james.infected");
+  protected static final AttributeName VIRUSCHECKED_MAIL_ATTRIBUTE_NAME = AttributeName.of("virusChecked");
+
+protected static final String MAIL_INFECTED_STATE = "Virus"; 
   protected static final String INFECTED_HEADER_NAME = "X-MessageIsInfected";
-  protected static final String INFECTED_HEADER_NAME_STATUS = "X-Virus-Status";
-  protected static final String INFECTED_HEADER_NAME_SCANNED = "X-Virus-Scanned";
+  protected static final String INFECTED_HEADER_STATUS = "X-Virus-Status";
+  protected static final String INFECTED_HEADER_SCANNED = "X-Virus-Scanned";
 
   private Path tmpDir;
   private String kpnVeiligPath;
@@ -94,6 +108,9 @@ public class KPNVeiligVirusScan extends GenericMailet {
             // Do nothing
           }
         }
+      //  mail.setState("virus"); // Route to virus processor
+      //  getMailetContext().sendMail(mail);
+
       } else {
         Files.delete(tempFile);
       }
@@ -169,7 +186,7 @@ public class KPNVeiligVirusScan extends GenericMailet {
    */
   private void handleInfected(Mail mail) throws MessagingException {
     mail.setErrorMessage("The attached email contained a virus and was blocked.");
-    // mail.setState(Mail.GHOST);
+    mail.setState(MAIL_INFECTED_STATE);
     try {
       removeAttachments(mail);
     } catch (IOException e) {
@@ -179,12 +196,13 @@ public class KPNVeiligVirusScan extends GenericMailet {
     // mark the mail with a mail attribute to check later on by other
     // matchers/mailets
     mail.setAttribute(makeInfectedAttribute(true));
+    mail.setAttribute(virusCheckedAttribute(true));
     MimeMessage mimeMessage = mail.getMessage();
 
     // mark the message with a header string
     mimeMessage.setHeader(INFECTED_HEADER_NAME, "true");
-    mimeMessage.addHeader(INFECTED_HEADER_NAME_STATUS, "Infected");
-    mimeMessage.addHeader(INFECTED_HEADER_NAME_SCANNED, INFONAME);
+    mimeMessage.addHeader(INFECTED_HEADER_STATUS, "Infected");
+    mimeMessage.addHeader(INFECTED_HEADER_SCANNED, INFONAME);
 
     mimeMessage.saveChanges();
 
@@ -193,6 +211,10 @@ public class KPNVeiligVirusScan extends GenericMailet {
 
   private Attribute makeInfectedAttribute(boolean value) {
     return new Attribute(INFECTED_MAIL_ATTRIBUTE_NAME, AttributeValue.of(value));
+  }
+
+  private Attribute virusCheckedAttribute(boolean value) {
+    return new Attribute(VIRUSCHECKED_MAIL_ATTRIBUTE_NAME, AttributeValue.of(value));
   }
 
   /**
