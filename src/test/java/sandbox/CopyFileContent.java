@@ -17,18 +17,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-
 import org.apache.james.core.builder.MimeMessageBuilder;
 import org.apache.james.mailets.Kwee.KPNVeiligVirusScan;
 import org.apache.mailet.Mail;
@@ -38,6 +26,18 @@ import org.apache.mailet.base.test.FakeMail;
 import org.apache.mailet.base.test.FakeMailetConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.activation.FileDataSource;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
+import jakarta.mail.Session;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 
 public class CopyFileContent {
   private static final Logger LOGGER = LoggerFactory.getLogger(CopyFileContent.class);
@@ -233,7 +233,7 @@ public class CopyFileContent {
 
     // 2. Base headers
     mimeMessage.setFrom("sender@example.com");
-    mimeMessage.setRecipients(javax.mail.Message.RecipientType.TO, "recipient@example.com");
+    mimeMessage.setRecipients(Message.RecipientType.TO, "recipient@example.com");
 
     MimeBodyPart messageBodyPart = new MimeBodyPart();
     Multipart multipart = new MimeMultipart();

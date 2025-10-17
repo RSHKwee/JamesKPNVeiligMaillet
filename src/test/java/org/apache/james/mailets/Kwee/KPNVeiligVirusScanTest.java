@@ -9,12 +9,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
-import javax.mail.Session;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.util.ByteArrayDataSource;
-
 import org.apache.james.core.builder.MimeMessageBuilder;
 import org.apache.mailet.Mail;
 import org.apache.mailet.MailetContext;
@@ -25,7 +19,13 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import jakarta.activation.DataHandler;
 import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.util.ByteArrayDataSource;
 
 public class KPNVeiligVirusScanTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(KPNVeiligVirusScanTest.class);
@@ -163,7 +163,7 @@ public class KPNVeiligVirusScanTest {
       String eicar = reverse("*H+H$!ELIF-TSET-SURIVITNA-DRADNATS-RACIE$}7)CC7)^P(45XZP\\4[PA@%P!O5X");
 
       mimeMessage.setFrom("sender@example.com");
-      mimeMessage.setRecipients(javax.mail.Message.RecipientType.TO, "recipient@example.com");
+      mimeMessage.setRecipients(jakarta.mail.internet.MimeMessage.RecipientType.TO, "recipient@example.com");
       mimeMessage.setSubject("Test: EICAR Virus Test File");
 
       // 3. Create multipart message with text and attachment
@@ -179,7 +179,7 @@ public class KPNVeiligVirusScanTest {
 
       // 3c. Datasource as attachment
       ByteArrayDataSource ds = new ByteArrayDataSource(eicar.getBytes(), "application/octet-stream");
-      attachmentPart.setDataHandler(new javax.activation.DataHandler(ds));
+      attachmentPart.setDataHandler(new DataHandler(ds));
       attachmentPart.setFileName("eicar.com");
       multipart.addBodyPart(attachmentPart);
 

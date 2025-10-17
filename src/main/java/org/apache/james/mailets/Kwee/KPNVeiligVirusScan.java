@@ -13,9 +13,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.concurrent.TimeUnit;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
 import org.apache.mailet.Attribute;
 import org.apache.mailet.AttributeName;
 import org.apache.mailet.AttributeValue;
@@ -25,6 +22,9 @@ import org.apache.mailet.base.GenericMailet;
 import org.apache.mailet.base.RFC2822Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 
 public class KPNVeiligVirusScan extends GenericMailet {
   private static final Logger LOGGER = LoggerFactory.getLogger(KPNVeiligVirusScan.class);
@@ -79,7 +79,7 @@ public class KPNVeiligVirusScan extends GenericMailet {
    * @throws MessagingException
    */
   @Override
-  public void service(Mail mail) throws MessagingException {
+  public void service(Mail mail) throws jakarta.mail.MessagingException {
     try {
       LOGGER.debug("KPN Veilig service");
       // Store mail temporarily on disk
@@ -175,7 +175,7 @@ public class KPNVeiligVirusScan extends GenericMailet {
    * @param file Temporary copy of mail on disk.
    * @throws MessagingException Message exception
    */
-  private void handleInfected(Mail mail, Path file) throws MessagingException {
+  private void handleInfected(Mail mail, Path file) throws jakarta.mail.MessagingException {
     mail.setErrorMessage("The attached email contained a virus and was blocked.");
     mail.setState(Mail.GHOST);
 

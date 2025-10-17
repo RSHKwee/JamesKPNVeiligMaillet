@@ -7,13 +7,13 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import javax.mail.MessagingException;
-
 import org.apache.james.mailets.Kwee.KPNVeiligVirusScan;
 import org.apache.mailet.MailetContext;
 import org.apache.mailet.base.test.FakeMailetConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.mail.MessagingException;
 
 public class Main {
   private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
