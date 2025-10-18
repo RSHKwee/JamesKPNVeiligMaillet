@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 public class KPNVeiligVirusScan extends GenericMailet {
   private static final Logger LOGGER = LoggerFactory.getLogger(KPNVeiligVirusScan.class);
   private static final String INFONAME = "KPN Veilig";
+  private static final String EXTRAINFO = "Antivirus Scanner Mailet (fsscan.exe)";
 
   protected static final AttributeName INFECTED_MAIL_ATTRIBUTE_NAME = AttributeName.of("org.apache.james.infected");
   protected static final AttributeName VIRUSCHECKED_MAIL_ATTRIBUTE_NAME = AttributeName.of("virusChecked");
@@ -173,7 +174,7 @@ protected static final String MAIL_INFECTED_STATE = "Virus";
    */
   @Override
   public String getMailetInfo() {
-    return INFONAME + " Antivirus Scanner Mailet (fsscan.exe)";
+    return INFONAME + " " + EXTRAINFO ;
   }
 
   // v ========== Private functions ================
